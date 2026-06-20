@@ -3,6 +3,7 @@ import { fontInter, fontVariables } from "@/lib/fonts";
 import "./globals.css";
 import { ThemeProvider } from "@/components/shared/theme/theme-provider";
 import { Toaster } from "@/components/shared/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "NovaCV",
@@ -51,6 +52,7 @@ export default async function RootLayout({
             <Toaster />
           </TooltipProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
