@@ -1,0 +1,18 @@
+{
+  "name": "novacv-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@10.8.2",
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}
