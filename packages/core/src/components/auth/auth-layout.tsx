@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { Sparkles } from "lucide-react"
 import { ThemeToggle } from "@/components/shared/theme/theme-toggle"
 import { Button } from "@/components/shared/ui/button"
 import { GitHubIcon } from "./icons"
+import TextLogo from "@/components/shared/logotext"
 
 const defaultStack = [
   "Next.js", "Supabase", "PostgreSQL", "Tailwind CSS",
@@ -37,16 +37,8 @@ export function AuthLayout({
     <div className="min-h-screen grid md:grid-cols-2 bg-background font-sans">
       {/* LEFT PANEL */}
       <div className="hidden md:flex flex-col justify-between p-10 bg-muted/30 border-r border-border/40">
-        <div className="flex items-center gap-2 group">
-          <div className="relative flex items-center justify-center p-1.5 bg-primary rounded-lg shadow-md shadow-primary/10 group-hover:scale-105 transition-transform duration-200 shrink-0">
-            <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-base tracking-tight">
-            NovaCV<span className="text-primary">.</span>
-          </span>
-          <span className="text-[10px] font-mono text-muted-foreground border border-border/50 rounded-sm px-1.5 py-0.5 ml-1">
-            v0.2 beta
-          </span>
+        <div className="flex items-center w-44 h-auto gap-2 group">
+          <TextLogo className="w-44 h-11" />
         </div>
 
         {/* Tagline + chips */}
@@ -84,12 +76,7 @@ export function AuthLayout({
         {/* Top bar */}
         <div className="flex items-center justify-between px-8 py-4 border-b border-border/40">
           <Link href="/" className="flex items-center gap-2 group md:hidden">
-            <div className="relative flex items-center justify-center p-1.5 bg-primary rounded-lg shadow-md shadow-primary/10 group-hover:scale-105 transition-transform duration-200 shrink-0">
-              <Sparkles className="w-3 h-3 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-sm">
-              NovaCV<span className="text-primary">.</span>
-            </span>
+            <TextLogo className="w-32" />
           </Link>
           <div className="ml-auto flex items-center gap-3">
             {alternateText && alternateLink && alternateLinkLabel && (

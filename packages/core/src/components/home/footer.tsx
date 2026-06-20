@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Sparkles } from "lucide-react"
 import { Github } from "@/components/home/github"
+import LogoIcon from "../shared/logo-icon"
 
 const GITHUB_URL = "https://github.com/asifrazadev/novacv"
 
@@ -11,9 +12,7 @@ export function Footer() {
     <footer className="py-8 border-t border-border/40">
       <div className="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-md bg-foreground flex items-center justify-center">
-            <Sparkles className="w-2.5 h-2.5 text-background" />
-          </div>
+          <LogoIcon className="w-10 h-10" />
           <span>NovaCV</span>
           <span className="text-border">·</span>
           <span>MIT License</span>

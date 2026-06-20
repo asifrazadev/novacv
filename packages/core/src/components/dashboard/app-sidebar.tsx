@@ -1,8 +1,9 @@
 "use client"
 
-import { FileText, User, Settings, ShieldCheck, Sparkles, LogOut, Layout, Briefcase } from "lucide-react"
+import { FileText, User, LogOut, Briefcase } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import TextLogo from "@/components/shared/logotext"
 
 import {
   Sidebar,
@@ -54,12 +55,7 @@ export function AppSidebar() {
       id="tour-sidebar"
     >
       <SidebarHeader className="pt-6 pb-2 px-4 flex flex-row items-center gap-2 z-10 bg-transparent overflow-hidden">
-        <div className="relative flex items-center justify-center p-1.5 bg-primary rounded-lg shadow-lg shadow-primary/20 shrink-0">
-          <Sparkles className="w-5 h-5 text-primary-foreground" />
-        </div>
-        <span className="text-xl font-bold tracking-tight">
-          NovaCV<span className="text-primary">.</span>
-        </span>
+        <TextLogo className="w-32 h-10" />
       </SidebarHeader>
 
       <SidebarContent className="bg-gradient-to-b from-sidebar via-sidebar to-sidebar/90 backdrop-blur-sm z-10 pt-4">

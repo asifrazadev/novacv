@@ -7,7 +7,7 @@ import { ZoomIn, ZoomOut, Maximize } from "lucide-react"
 import { Button } from "@/components/shared/ui/button"
 import { Separator } from "@/components/shared/ui/separator"
 import { ResumePreview } from "@/components/builder/preview/ResumePreview"
-import { Sparkles } from "lucide-react"
+import TextLogo from "@/components/shared/logotext"
 
 export function PublicViewer({ initialData }: { initialData: unknown }): React.ReactElement {
   const [zoom, setZoom] = React.useState(100)
@@ -27,14 +27,13 @@ export function PublicViewer({ initialData }: { initialData: unknown }): React.R
     <div className="flex-1 bg-muted/30 relative overflow-hidden flex flex-col h-screen text-black">
       {/* Top Banner */}
       <div className="w-full bg-background border-b h-14 flex items-center justify-between px-6 z-10 shrink-0">
-        <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <Sparkles className="h-4 w-4" />
-          <span>NovaCV</span>
+        <div className="flex items-center gap-2">
+          <TextLogo className="w-28 h-10 text-foreground" />
         </div>
-        <a 
-          href="/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-1.5 rounded-full transition-colors"
         >
           Build your own resume

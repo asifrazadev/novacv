@@ -3,12 +3,14 @@
 import Link from "next/link"
 import { Sparkles, LayoutDashboard } from "lucide-react"
 import { ThemeToggle } from "@/components/shared/theme/theme-toggle"
+import LogoIcon from "@/components/shared/logo-icon"
 import { Button } from "@/components/shared/ui/button"
 import { Badge } from "@/components/shared/ui/badge"
 import { Github } from "@/components/home/github"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import TextLogo from "../shared/logotext"
 
 const GITHUB_URL = "https://github.com/asifrazadev/novacv"
 
@@ -40,18 +42,7 @@ export function Navbar() {
     <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container mx-auto px-3 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2 group">
-          <div className="relative flex items-center justify-center p-1.5 bg-primary rounded-lg shadow-md shadow-primary/10 group-hover:scale-105 transition-transform duration-200 shrink-0">
-            <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-base tracking-tight">
-            NovaCV<span className="text-primary">.</span>
-          </span>
-          <Badge
-            variant="outline"
-            className="text-[10px] hidden md:block font-mono px-1.5 py-0 border-border/60 text-muted-foreground rounded-sm ml-1"
-          >
-            v0.2 beta
-          </Badge>
+          <TextLogo className="w-44" />
         </div>
 
         <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">

@@ -4,6 +4,8 @@ import * as React from "react"
 import Link from "next/link"
 import { Cloud, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/shared/ui/button"
+import TextLogo from "@/components/shared/logotext"
+import LogoIcon from "@/components/shared/logo-icon"
 import { useBuilder } from "@/components/builder/builder-context"
 import { Separator } from "@/components/shared/ui/separator"
 import { cn } from "@/lib/utils"
@@ -20,12 +22,8 @@ export function BuilderHeader() {
       <div className="flex items-center gap-4">
         <MobileBuilderNav />
         <Link href="/dashboard" className="flex items-center gap-2 group mr-1">
-          <div className="relative flex items-center justify-center p-1.5 bg-primary rounded-lg shadow-md shadow-primary/10 group-hover:scale-105 transition-transform duration-200 shrink-0">
-            <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-          </div>
-          <span className="text-sm font-bold tracking-tight hidden sm:block">
-            NovaCV<span className="text-primary">.</span>
-          </span>
+          <LogoIcon className="w-7 h-7 sm:hidden" />
+          <TextLogo className="w-28 h-10 hidden sm:block" />
         </Link>
         <Separator orientation="vertical" className="h-4" />
         <div className="flex items-center gap-2 text-sm max-w-[150px] sm:max-w-none">
