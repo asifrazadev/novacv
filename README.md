@@ -64,6 +64,7 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 16 (App Router)](https://nextjs.org) with React 19 - Latest cutting-edge version
+- **Monorepo**: [Turborepo](https://turbo.build) - High-performance build system
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com) with PostCSS support
 - **State Management**: [Zustand](https://github.com/pmndrs/zustand) - Lightweight client state management
 - **Database & Authentication**: [Supabase](https://supabase.com) - Open-source Firebase alternative
@@ -100,6 +101,8 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 
 ### Installation & Setup
 
+This project is structured as a **Turborepo monorepo**.
+
 #### 1. **Clone the Repository**
 ```bash
 git clone https://github.com/asifrazadev/NovaCV.git
@@ -109,8 +112,6 @@ cd NovaCV
 #### 2. **Install Dependencies**
 ```bash
 npm install
-# or
-pnpm install
 ```
 
 #### 3. **Set Up Supabase Project**
@@ -237,12 +238,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-### How to Contribute
-1. **Fork** the repository
-2. **Create your feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit your changes**: `git commit -m 'Add some amazing feature'`
-4. **Push to the branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
+Please refer to our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to get started, branch naming, commit formats, and the PR process. By participating, you are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### Areas We Need Help With
 - 🎨 Additional resume templates
