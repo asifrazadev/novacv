@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { ProfileTabsClient } from "@/components/dashboard/profile-tabs"
 import { FormMessageToast } from "@/components/shared/forms/form-message-toast"
@@ -14,7 +15,9 @@ export default async function ProfilePage(props: { searchParams: Promise<{ messa
         <p className="text-muted-foreground">Manage your profile details, theme preferences, security, AI configurations, and social accounts.</p>
       </div>
 
-      <ProfileTabsClient user={user} />
+      <Suspense fallback={<div className="h-40 w-full animate-pulse bg-muted/20 rounded-xl" />}>
+        <ProfileTabsClient user={user} />
+      </Suspense>
 
       {searchParams?.message && (
         <FormMessageToast message={searchParams.message} />

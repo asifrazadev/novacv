@@ -17,7 +17,13 @@ export function Footer() {
           <span className="text-border">·</span>
           <span>MIT License</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4 mt-4 sm:mt-0">
+          <Link href="/privacy" className="hover:text-foreground p-1 transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="hover:text-foreground p-1 transition-colors">
+            Terms of Service
+          </Link>
           <a
             href={GITHUB_URL}
             target="_blank"
