@@ -207,17 +207,30 @@ function renderResumes(resumes) {
   // Attach event listeners for PDF buttons
   const pdfBtns = resumesList.querySelectorAll('.pdf-btn');
   pdfBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       const resumeId = e.target.getAttribute('data-resume-id');
       const pdfUrl = `${CONFIG.BASE_URL}/api/resumes/${resumeId}/pdf`;
       showLoading('Generating PDF...');
-      chrome.downloads.download({
-        url: pdfUrl,
-        filename: `NovaCV_Resume_${resumeId.substring(0,6)}.pdf`,
-        saveAs: true
-      }, () => {
+      
+      try {
+        const res = await fetch(pdfUrl, { credentials: 'include' });
+        if (!res.ok) throw new Error("Failed to generate PDF");
+        
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        
+        chrome.downloads.download({
+          url: objectUrl,
+          filename: `NovaCV_Resume_${resumeId.substring(0,6)}.pdf`,
+          saveAs: true
+        }, () => {
+          hideLoading();
+          setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
+        });
+      } catch (err) {
         hideLoading();
-      });
+        showMsg("Failed to download PDF", "error");
+      }
     });
   });
 }
