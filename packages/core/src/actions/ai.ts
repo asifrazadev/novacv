@@ -811,14 +811,7 @@ export async function extractResumeDataWithAI(
         model: resolvedConfig.model,
         temperature: 0,
         max_tokens: 4000,
-        reasoning: {
-          enabled: false
-        },
-        extra_body: {
-          reasoning: {
-            effort: "low"
-          }
-        },
+
         messages: [
           {
             role: "system",
