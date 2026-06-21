@@ -22,7 +22,8 @@ export async function GET() {
     }
 
     // Set up archiver
-    const archive = archiver('zip', {
+    const { ZipArchive } = require('archiver');
+    const archive = new ZipArchive({
       zlib: { level: 9 }
     });
 
