@@ -57,12 +57,12 @@ export async function getPage(): Promise<PageType> {
       console.log('[Playwright Pool] pooled page has a dead browser, closing')
       try {
         await page.close()
-      } catch {}
+      } catch { }
     } catch {
       console.log('[Playwright Pool] failed to reuse page, closing')
       try {
         await page.close()
-      } catch {}
+      } catch { }
     }
   }
 
@@ -87,7 +87,7 @@ export async function releasePage(page: PageType) {
   }
   try {
     await page.close()
-  } catch {}
+  } catch { }
 }
 
 async function warmPool() {

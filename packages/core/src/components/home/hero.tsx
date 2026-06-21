@@ -34,11 +34,16 @@ export function Hero() {
               NovaCV uses AI to craft tailored, ATS-friendly resumes in minutes. Land the interview without spending the weekend wrestling with Word templates.
             </p>
 
-            <div className="mt-10 w-full sm:w-auto">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Button size="lg" asChild className="w-full sm:w-auto h-14 px-8 rounded-xl text-base font-bold bg-gradient-to-r from-primary to-primary/80 hover:to-primary-dark hover:bg-primary-dark/70 text-primary-foreground shadow-[0_0_30px_color-mix(in_srgb,var(--primary)_35%,transparent)] hover:-translate-y-0.5 hover:shadow-[0_0_40px_color-mix(in_srgb,var(--primary)_50%,transparent)] transition-all duration-300">
                 <Link href="/register">
                   Build my resume — free <Zap className="ml-2 w-5 h-5 fill-current" />
                 </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="w-full sm:w-auto h-14 px-8 rounded-xl text-base font-bold border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all duration-300">
+                <a href="/api/extension/download">
+                  Download Extension
+                </a>
               </Button>
             </div>
 

@@ -55,7 +55,9 @@ export function AppSidebar() {
       id="tour-sidebar"
     >
       <SidebarHeader className="pt-6 pb-2 px-4 flex flex-row items-center gap-2 z-10 bg-transparent overflow-hidden">
-        <TextLogo className="w-32 h-10" />
+        <Link href="/dashboard" className="hover:opacity-90 transition-opacity">
+          <TextLogo className="w-32 h-10" />
+        </Link>
       </SidebarHeader>
 
       <SidebarContent className="bg-gradient-to-b from-sidebar via-sidebar to-sidebar/90 backdrop-blur-sm z-10 pt-4">

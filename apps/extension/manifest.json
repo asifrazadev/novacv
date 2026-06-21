@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "NovaCV Job Tracker",
+  "version": "1.1",
+  "icons": {
+    "128": "icon.png"
+  },
+  "description": "Save job postings directly to your NovaCV Kanban board.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "alarms",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
+}

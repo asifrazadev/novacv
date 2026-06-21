@@ -37,9 +37,9 @@ export function AuthLayout({
     <div className="min-h-screen grid md:grid-cols-2 bg-background font-sans">
       {/* LEFT PANEL */}
       <div className="hidden md:flex flex-col justify-between p-10 bg-muted/30 border-r border-border/40">
-        <div className="flex items-center w-44 h-auto gap-2 group">
+        <Link href="/" className="flex items-center w-44 h-auto gap-2 group hover:opacity-90 transition-opacity">
           <TextLogo className="w-44 h-11" />
-        </div>
+        </Link>
 
         {/* Tagline + chips */}
         <div className="space-y-6">

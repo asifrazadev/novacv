@@ -10,6 +10,16 @@ export async function getApplications() {
     if (!user) {
       return { error: "Unauthorized" }
     }
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+
+    // Auto-cleanup: delete applications that haven't been updated in over a month
+    await supabase
+      .from("job_applications")
+      .delete()
+      .eq("user_id", user.id)
+      .lt("updated_at", oneMonthAgo.toISOString())
+
     const { data, error } = await supabase
       .from("job_applications")
       .select("*")

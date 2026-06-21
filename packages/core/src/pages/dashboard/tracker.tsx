@@ -18,7 +18,8 @@ import {
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { WelcomeGuide } from "@/components/shared/ui/welcome-guide"
-import { LayoutDashboard, Database, Link as LinkIcon } from "lucide-react"
+import { LayoutDashboard, Database, Link as LinkIcon, Download } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 const TRACKER_FEATURES = [
   {
@@ -32,9 +33,14 @@ const TRACKER_FEATURES = [
     description: "Store essential metadata like salary ranges, recruiter names, and external job posting links."
   },
   {
-    icon: <LinkIcon className="w-5 h-5" />,
-    title: "Always Synced",
-    description: "Your applications sync with Supabase and are seamlessly linked to the resumes you've generated."
+    icon: <Download className="w-5 h-5" />,
+    title: "Browser Extension",
+    description: "Download our Chrome extension to save jobs directly to your board from any website."
+  },
+  {
+    icon: <Trash2 className="w-5 h-5" />,
+    title: "Auto-Cleanup",
+    description: "To keep your board fresh, applications with no updates for over 1 month are automatically deleted."
   }
 ]
 
@@ -55,8 +61,13 @@ const TRACKER_STEPS = [
   },
   {
     title: "Add Application ➕",
-    description: "Click here to add a new job application card. Fill in the company, position, salary range, and url to get started.",
+    description: "Click here to add a new job application card.",
     selector: "#tour-add-application"
+  },
+  {
+    title: "Browser Extension 🧩",
+    description: "Install our Chrome Extension to auto-fill these cards from any job board!",
+    selector: "#tour-download-extension"
   }
 ]
 
@@ -82,6 +93,8 @@ export default function TrackerPage() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [isEditOpen, setIsEditOpen] = React.useState(false)
   const [selectedApp, setSelectedApp] = React.useState<any>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null)
 
   // Form states
   const [company, setCompany] = React.useState("")
@@ -94,8 +107,8 @@ export default function TrackerPage() {
   const [appliedAt, setAppliedAt] = React.useState("")
 
   // Fetch applications on mount
-  const loadData = React.useCallback(async () => {
-    setLoading(true)
+  const loadData = React.useCallback(async (background = false) => {
+    if (!background) setLoading(true)
     const res = await getApplications()
 
     if (res.error === "database_error" || res.error === "server_error") {
@@ -108,12 +121,35 @@ export default function TrackerPage() {
       setApplications(res.data)
       setLocalMode(false)
     }
-    setLoading(false)
+    if (!background) setLoading(false)
   }, [])
 
   React.useEffect(() => {
     loadData()
   }, [loadData])
+
+  // Supabase Realtime Subscription
+  React.useEffect(() => {
+    if (localMode) return // Don't subscribe in local mode
+    
+    const supabase = createClient()
+    const channel = supabase
+      .channel('public:job_applications')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'job_applications' },
+        (payload) => {
+          // Whenever a change happens (e.g. from the Chrome Extension or another tab)
+          // silently refetch the data in the background to keep the board perfectly in sync!
+          loadData(true)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [localMode, loadData])
 
   // Save to local storage when local mode is active and state changes
   React.useEffect(() => {
@@ -154,6 +190,7 @@ export default function TrackerPage() {
       return
     }
 
+    setIsSubmitting(true)
     const payload = {
       company: company.trim(),
       position: position.trim(),
@@ -180,9 +217,10 @@ export default function TrackerPage() {
         toast.error(`Error adding: ${res.message}`)
       } else {
         toast.success("Job application tracker entry added.")
-        loadData()
+        loadData(true)
       }
     }
+    setIsSubmitting(false)
     setIsCreateOpen(false)
   }
 
@@ -194,6 +232,7 @@ export default function TrackerPage() {
       return
     }
 
+    setIsSubmitting(true)
     const payload = {
       company: company.trim(),
       position: position.trim(),
@@ -218,15 +257,14 @@ export default function TrackerPage() {
         toast.error(`Error updating: ${res.message}`)
       } else {
         toast.success("Job application updated.")
-        loadData()
+        loadData(true)
       }
     }
+    setIsSubmitting(false)
     setIsEditOpen(false)
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this application?")) return
-
     if (localMode) {
       setApplications(prev => prev.filter(app => app.id !== id))
       toast.success("Job application deleted locally.")
@@ -236,25 +274,26 @@ export default function TrackerPage() {
         toast.error(`Error deleting: ${res.message}`)
       } else {
         toast.success("Job application deleted.")
-        loadData()
+        loadData(true)
       }
     }
   }
 
   const handleMoveStatus = async (id: string, newStatus: string) => {
+    // Optimistically update the UI to prevent any flashing/lag
+    setApplications(prev => prev.map(app =>
+      app.id === id
+        ? { ...app, status: newStatus, updated_at: new Date().toISOString() }
+        : app
+    ))
+
     if (localMode) {
-      setApplications(prev => prev.map(app =>
-        app.id === id
-          ? { ...app, status: newStatus, updated_at: new Date().toISOString() }
-          : app
-      ))
       toast.success("Moved application.")
     } else {
       const res = await updateApplicationStatus(id, newStatus)
       if (res.error) {
         toast.error("Error shifting card status.")
-      } else {
-        loadData()
+        loadData(true) // Revert on error
       }
     }
   }
@@ -277,7 +316,15 @@ export default function TrackerPage() {
             Track status, notes, dates, and details for all your job applications.
           </p>
         </div>
-        <div className="flex items-center gap-2 self-start sm:self-center">
+        <div className="flex items-center gap-2 self-start sm:self-center flex-wrap">
+          <a 
+            id="tour-download-extension"
+            href="/api/extension/download" 
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-bold ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 h-8 px-3 py-2 gap-1.5 flex-1 sm:flex-none"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download Extension
+          </a>
           <Button
             variant="outline"
             size="sm"
@@ -446,7 +493,9 @@ export default function TrackerPage() {
               <Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. recruiter name, referrals, tech stack..." className="min-h-[80px]" />
             </div>
             <DialogFooter>
-              <Button type="submit">Add Application</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Adding..." : "Add Application"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -506,7 +555,9 @@ export default function TrackerPage() {
               <Textarea id="edit-notes" value={notes} onChange={e => setNotes(e.target.value)} className="min-h-[80px]" />
             </div>
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -592,7 +643,7 @@ export default function TrackerPage() {
                     onClick={() => {
                       const id = selectedDetailApp.id
                       setSelectedDetailApp(null)
-                      handleDelete(id)
+                      setDeleteTargetId(id)
                     }}
                   >
                     Delete Card
@@ -622,6 +673,29 @@ export default function TrackerPage() {
               </>
             )
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteTargetId} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Delete Application</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this application? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 mt-2">
+            <Button variant="outline" onClick={() => setDeleteTargetId(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => {
+              if (deleteTargetId) handleDelete(deleteTargetId)
+              setDeleteTargetId(null)
+            }}>
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

@@ -15,16 +15,12 @@ export async function getBrowser(): Promise<BrowserType> {
     if (cachedBrowser.isConnected()) {
       return cachedBrowser
     }
-    console.log('[Playwright Pool] browser was disconnected, resetting')
     globalForPlaywright.globalBrowser = undefined
   }
 
   if (globalForPlaywright.launchPromise) {
-    console.log('[Playwright Pool] Awaiting existing launch promise')
     return globalForPlaywright.launchPromise
   }
-
-  console.log('[Playwright Pool] LAUNCHING new browser')
 
   const isCloud = !!process.env.AWS_LAMBDA_FUNCTION_NAME || !!process.env.VERCEL || !!process.env.RENDER
   const isLocal = !isCloud || process.platform === "win32" || process.platform === "darwin"
@@ -71,7 +67,6 @@ export async function getBrowser(): Promise<BrowserType> {
     globalForPlaywright.launchPromise = undefined
 
     b.on("disconnected", () => {
-      console.log('[Playwright Pool] Browser disconnected')
       globalForPlaywright.globalBrowser = undefined
     })
 

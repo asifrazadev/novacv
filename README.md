@@ -4,6 +4,10 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 
 ![NovaCV Banner](https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=1200&h=400)
 
+**Your data, your infrastructure.** NovaCV is a 100% open-source resume builder and application tracker. Unlike closed, paywalled competitors, you can self-host NovaCV to keep your professional data fully under your control. Use local AI models via Ollama to ensure your data never touches a third-party server.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fasifrazadev%2FNovaCV)
+
 ## ✨ Features
 
 ### 🚀 Core Features - Currently Implemented
@@ -218,11 +222,11 @@ npm run lint         # Run ESLint
 ### Deployment
 
 #### Deploy to Vercel (Recommended)
-1. Push your code to GitHub
-2. Go to [Vercel Dashboard](https://vercel.com)
-3. Click "New Project" and select your NovaCV repository
-4. Set environment variables in Vercel project settings
-5. Deploy!
+1. Use the [Deploy with Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fasifrazadev%2FNovaCV) button.
+2. Set your Supabase environment variables during the deployment step.
+3. Deploy!
+
+For full self-hosting documentation (including Docker Compose), see our [Self-Hosting Guide](docs/self-hosting.md).
 
 #### Deploy to Other Platforms
 The app is a standard Next.js application and can be deployed to any Node.js hosting service (AWS, Heroku, Railway, etc.). Ensure:

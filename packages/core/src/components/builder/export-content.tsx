@@ -32,11 +32,9 @@ export function ExportContent({ data }: ExportContentProps) {
   } = usePageDimensions(data.metadata.page)
 
   useLayoutEffect(() => {
-    console.log('[ExportContent] running layout calculation layoutEffect')
     
     // FAST PATH: Skip expensive measurements if pagination is cached
     if (data.metadata?.paginationCache && Array.isArray(data.metadata.paginationCache)) {
-      console.log('[ExportContent] Using pagination cache! Skipping reflows.')
       setPages(data.metadata.paginationCache)
       setIsLayoutCalculated(true)
       return

@@ -42,7 +42,9 @@ export function Navbar() {
     <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container mx-auto px-3 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2 group">
-          <TextLogo className="w-44" />
+          <Link href={user ? "/dashboard" : "/"}>
+            <TextLogo className="w-44 hover:opacity-90 transition-opacity" />
+          </Link>
         </div>
 
         <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">

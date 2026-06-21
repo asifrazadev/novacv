@@ -1,6 +1,6 @@
 "use client"
 
-import { Cpu, Layout, Download, Shield, Terminal, Zap, type LucideIcon } from "lucide-react"
+import { Cpu, Layout, Download, Shield, Puzzle, Zap, type LucideIcon } from "lucide-react"
 
 interface Feature {
   icon: LucideIcon
@@ -30,9 +30,9 @@ const features: Feature[] = [
     desc: "Your data is private, secured by Supabase Auth.",
   },
   {
-    icon: Terminal,
-    title: "Modern Tech Stack",
-    desc: "Built on Next.js 15, React 19, and Tailwind v4.",
+    icon: Puzzle,
+    title: "Browser Extension",
+    desc: "Save jobs to your Kanban board straight from LinkedIn and others.",
   },
   {
     icon: Zap,
@@ -64,7 +64,7 @@ export function Features() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base mb-2 text-foreground">{f.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{f.desc || (f as any).description}</p>
                 </div>
               </div>
             </div>
