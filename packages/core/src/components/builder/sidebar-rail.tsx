@@ -63,7 +63,7 @@ export function SidebarRail() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div id="tour-builder-sidebar" className={`${activeSection === "" ? "w-40" : "w-15"} ${activeSection === "" ? "items-start pl-2" : "items-center"} overflow-x-hidden border-r border-border/40 bg-muted/10 backdrop-blur-md flex flex-col py-4 gap-4 h-full overflow-y-auto scrollbar-hide shrink-0 z-10`}>
+      <div id="tour-builder-sidebar" className={`${activeSection === "" ? "w-40" : "w-15"} ${activeSection === "" ? "items-start pl-2" : "items-center"} overflow-x-hidden border-r border-border/40 bg-muted/10 backdrop-blur-md flex flex-col relative z-40 py-4 gap-4 h-full overflow-y-auto scrollbar-hide shrink-0 z-10`}>
         <div className="flex flex-col gap-2">
           {sections.map((item) => (
             <Tooltip key={item.id}>

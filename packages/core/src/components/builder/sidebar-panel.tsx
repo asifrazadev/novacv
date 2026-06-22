@@ -53,16 +53,26 @@ export function SidebarPanel() {
   const { data, activeSection, setActiveSection, addSectionItem } = useBuilder()
   const [isWizardMode, setIsWizardMode] = React.useState(false)
 
-  const [sidebarWidth, setSidebarWidth] = React.useState(320)
+  const [sidebarWidth, setSidebarWidth] = React.useState(360)
   const [isResizing, setIsResizing] = React.useState(false)
 
-  const startResizing = React.useCallback(() => setIsResizing(true), [])
-  const stopResizing = React.useCallback(() => setIsResizing(false), [])
+  const startResizing = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [])
+
+  const stopResizing = React.useCallback(() => {
+    setIsResizing(false)
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }, [])
 
   const resize = React.useCallback((e: MouseEvent) => {
     if (isResizing) {
       const newWidth = e.clientX - 48
-      if (newWidth >= 250 && newWidth <= 600) setSidebarWidth(newWidth)
+      if (newWidth >= 330 && newWidth <= 600) setSidebarWidth(newWidth)
     }
   }, [isResizing])
 
@@ -133,7 +143,7 @@ export function SidebarPanel() {
   return (
     <div
       className="border-r border-border/40 bg-background/60 backdrop-blur-xl flex flex-col h-full shrink-0 relative group/sidebar overflow-hidden w-full lg:w-auto"
-      style={{ width: isMounted && window.innerWidth >= 1024 ? `${sidebarWidth}px` : undefined }}
+      style={{ width: isMounted && window.innerWidth >= 1024 ? `${sidebarWidth - 50}px` : undefined }}
     >
       {/* Wizard Progress Line */}
       {isWizardMode && currentIndex >= 0 && (
@@ -194,7 +204,7 @@ export function SidebarPanel() {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 w-full overflow-x-hidden">
+      <ScrollArea className="flex-1  w-full overflow-x-hidden">
         <div className={cn("p-4 space-y-6 w-full min-w-0", isWizardMode ? "pb-24" : "pb-20")}>
           {SectionComponent ? <SectionComponent /> : null}
         </div>

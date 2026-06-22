@@ -240,7 +240,15 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
         })
       }
 
-      const finalPages = pagesList.filter(p => p.main.length > 0 || p.sidebar.length > 0)
+      let finalPages = pagesList.filter(p => p.main.length > 0 || p.sidebar.length > 0)
+      if (finalPages.length === 0) {
+        finalPages = [{
+          main: [],
+          sidebar: [],
+          showHeader: true,
+          showFooter: true
+        }]
+      }
       setPages(finalPages)
       
       // Cache pagination for fast export, but only if changed to prevent infinite loops

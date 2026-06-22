@@ -35,7 +35,7 @@ export function PageContainer({
         Page {index + 1}
       </div>
       <div
-        className="bg-white shadow-2xl relative ring-1 ring-black/5 overflow-hidden transition-all mx-auto"
+        className="bg-white shadow-2xl relative ring-1 ring-black/5 overflow-hidden transition-all mx-auto break-words"
         style={{
           width: `${widthPx * (zoom / 100)}px`,
           height: `${heightPx * (zoom / 100)}px`,

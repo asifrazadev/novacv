@@ -143,7 +143,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((exp, index) => (
                                 <div key={index} data-item-id={exp.id}>
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.92em]">
+                                        <span className="font-bold text-[0.92em] w-[80%]">
                                             <LinkedTitle
                                                 show={exp.showLinkInTitle}
                                                 url={exp.website}
@@ -194,7 +194,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((proj, index) => (
                                 <div key={index} data-item-id={proj.id}>
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.92em]">
+                                        <span className="font-bold text-[0.92em] w-[80%]">
                                             <LinkedTitle
                                                 show={proj.showLinkInTitle}
                                                 url={proj.url}
@@ -225,7 +225,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((vol, index) => (
                                 <div key={index} data-item-id={vol.id}>
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.92em]">
+                                        <span className="font-bold text-[0.92em] w-[80%]">
                                             <LinkedTitle
                                                 show={vol.showLinkInTitle}
                                                 url={vol.website}
@@ -256,7 +256,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((pub, index) => (
                                 <div key={index} data-item-id={pub.id}>
                                     <div className="flex justify-between items-baseline text-[0.85em]">
-                                        <span className="font-bold">
+                                        <span className="font-bold w-[80%]">
                                             <LinkedTitle
                                                 show={pub.showLinkInTitle}
                                                 url={pub.url}
@@ -330,7 +330,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((edu, index) => (
                                 <div key={index} data-item-id={edu.id}>
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.92em]">
+                                        <span className="font-bold text-[0.92em] w-[80%]">
                                             <LinkedTitle
                                                 show={edu.showLinkInTitle}
                                                 url={edu.website}
@@ -388,7 +388,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             {items.map((c, index) => (
                                 <div key={index} data-item-id={c.id}>
                                     <div className="flex justify-between text-[0.8em]">
-                                        <span className="font-semibold">
+                                        <span className="font-semibold w-[80%]">
                                             <LinkedTitle
                                                 show={c.showLinkInTitle}
                                                 url={c.url}
@@ -418,7 +418,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                         <div className="space-y-1">
                             {items.map((a, index) => (
                                 <div key={index} data-item-id={a.id} className="flex justify-between text-[0.8em]">
-                                    <span>
+                                    <span className="w-[80%]">
                                         <LinkedTitle
                                             show={a.showLinkInTitle}
                                             url={a.url}
@@ -450,7 +450,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                 {items.map((item: any, index: number) => (
                                     <div key={index} data-item-id={item.id}>
                                         <div className="flex justify-between items-baseline">
-                                            <span className="font-bold text-[0.92em]">
+                                            <span className="font-bold text-[0.92em] w-[80%]">
                                                 <LinkedTitle
                                                     show={!!item.url}
                                                     url={item.url}
@@ -501,12 +501,12 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     <div style={styles.headline}>{basics.headline || "Professional Headline"}</div>
                                 </div>
                                 {basics.picture?.url && basics.picture?.visible !== false && (
-                                    <div 
-                                        className={`shrink-0 overflow-hidden ${basics.picture.grayscale ? "grayscale" : ""}`} 
-                                        style={{ 
-                                            width: `${basics.picture.size}px`, 
-                                            height: `${basics.picture.size}px`, 
-                                            borderRadius: `${basics.picture.borderRadius}%`, 
+                                    <div
+                                        className={`shrink-0 overflow-hidden ${basics.picture.grayscale ? "grayscale" : ""}`}
+                                        style={{
+                                            width: `${basics.picture.size}px`,
+                                            height: `${basics.picture.size}px`,
+                                            borderRadius: `${basics.picture.borderRadius}%`,
                                             border: `${basics.picture.borderWidth}px solid ${design.primaryColor || "#1a1a1a"}`,
                                             boxShadow: basics.picture.shadow ? `0 ${basics.picture.shadow}px ${basics.picture.shadow * 1.5}px rgba(0,0,0,0.15)` : undefined,
                                             transform: basics.picture.rotation ? `rotate(${basics.picture.rotation}deg)` : undefined
@@ -544,7 +544,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                             const shouldBeFullWidth = !isCompact || (!prevIsCompact && !nextIsCompact)
 
                             return (
-                                <div key={ref.id} data-section-id={ref.id} className={cn("section-block mb-6", shouldBeFullWidth && "col-span-2")}>
+                                <div key={ref.id} data-section-id={ref.id} className={cn("section-block mb-6 min-w-0", shouldBeFullWidth && "col-span-2")}>
                                     {renderSection(ref)}
                                 </div>
                             )
@@ -560,7 +560,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     const shouldBeFullWidth = !isCompact || (!prevIsCompact && !nextIsCompact)
 
                                     return (
-                                        <div key={ref.id} data-section-id={ref.id} className={cn("section-block mb-6", shouldBeFullWidth && "col-span-2")}>
+                                        <div key={ref.id} data-section-id={ref.id} className={cn("section-block mb-6 min-w-0", shouldBeFullWidth && "col-span-2")}>
                                             {renderSection(ref)}
                                         </div>
                                     )
@@ -570,7 +570,7 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                     </div>
                 </div>
             </div>
-            <style jsx global>{`
+            <style>{`
         .executive-bullets ul {
           list-style: none;
           padding-left: 0;

@@ -21,7 +21,7 @@ export function MeasurementLayer({
   return (
     <div
       ref={measureRef}
-      className="fixed -left-[10000px] top-0 pointer-events-none bg-white text-black overflow-hidden"
+      className="fixed -left-[10000px] top-0 pointer-events-none bg-white text-black overflow-hidden break-words"
       style={{
         width: `${widthMm}mm`,
         padding: `${paddingMm}mm`,

@@ -110,7 +110,7 @@ function SortableAccordionItem({
       style={style}
       value={item.id}
       className={cn(
-        "border-b-0 mb-2 border rounded-md px-3 bg-card/50 overflow-hidden relative transition-all",
+        "border-b-0 mb-2 border w-full rounded-md px-3 bg-card/50 overflow-hidden relative transition-all",
         isDragging && "opacity-50 ring-2 ring-primary border-primary bg-primary/5 shadow-lg"
       )}
     >
@@ -124,8 +124,8 @@ function SortableAccordionItem({
           <GripVertical className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
         </div>
 
-        <AccordionTrigger className="hover:no-underline py-3 overflow-hidden flex-1 select-none pr-4">
-          <div className="flex flex-col items-start pr-4 truncate w-full text-left min-w-0">
+        <AccordionTrigger className="hover:no-underline w-90 py-3 overflow-hidden flex select-none pr-4">
+          <div className="flex flex-col items-start pr-4 truncate w-full text-left min-w-0 max-w-full">
             <span className="font-medium text-sm truncate w-full block">
               {item.company || item.school || item.name || item.title || item.organization || "Untitled"}
             </span>
@@ -193,7 +193,7 @@ export function ListSection({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="!w-full">
           {items.map((item) => (
             <SortableAccordionItem
               key={item.id}

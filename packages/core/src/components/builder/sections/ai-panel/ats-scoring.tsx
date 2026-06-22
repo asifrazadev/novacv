@@ -705,12 +705,12 @@ export function AtsScoring({ getRenderedText, wordCount, charCount }: AtsScoring
   return (
     <div className="space-y-5 mt-4 animate-in fade-in duration-300">
       {/* Resume Statistics (Words & Characters) */}
-      <div className="grid grid-cols-2 gap-3 mb-1">
-        <div className="p-3 border border-border/40 rounded-xl bg-muted/10 backdrop-blur-xs flex flex-col justify-center">
+      <div className="flex flex-wrap gap-3 mb-1">
+        <div className="flex-1 min-w-[120px] p-3 border border-border/40 rounded-xl bg-muted/10 backdrop-blur-xs flex flex-col justify-center">
           <div className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Resume Words</div>
           <div className="text-lg font-black text-foreground">{wordCount}</div>
         </div>
-        <div className="p-3 border border-border/40 rounded-xl bg-muted/10 backdrop-blur-xs flex flex-col justify-center">
+        <div className="flex-1 min-w-[120px] p-3 border border-border/40 rounded-xl bg-muted/10 backdrop-blur-xs flex flex-col justify-center">
           <div className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Characters</div>
           <div className="text-lg font-black text-foreground">{charCount}</div>
         </div>
@@ -885,11 +885,11 @@ export function AtsScoring({ getRenderedText, wordCount, charCount }: AtsScoring
       </div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-wrap gap-3">
         <Button
           size="sm"
           variant="outline"
-          className="h-9 gap-1.5 shadow-sm text-xs font-semibold"
+          className="flex-1 min-w-[130px] h-9 gap-1.5 shadow-sm text-xs font-semibold"
           onClick={handleAnalyze}
           disabled={isAnalyzing}
         >
@@ -898,7 +898,7 @@ export function AtsScoring({ getRenderedText, wordCount, charCount }: AtsScoring
         </Button>
         <Button
           size="sm"
-          className="h-9 gap-1.5 shadow-sm text-xs bg-primary text-primary-foreground hover:bg-primary/95 font-semibold"
+          className="flex-1 min-w-[130px] h-9 gap-1.5 shadow-sm text-xs bg-primary text-primary-foreground hover:bg-primary/95 font-semibold"
           onClick={handleTailor}
           disabled={isTailoring || !jobDescription.trim()}
         >

@@ -26,7 +26,7 @@ export function MobileBuilderNav() {
     resumeId
   } = useBuilder()
   const [open, setOpen] = React.useState(false)
-  const { isExporting, handleExportPDF: triggerPdf, handleExportBackup: triggerBackup } = usePrintExport(resumeId, title, data)
+  const { isExporting, handleExportPDF: triggerPdf, handleExportDocx: triggerDocx, handleExportTxt: triggerTxt, handleExportBackup: triggerBackup } = usePrintExport(resumeId, title, data)
 
   const handleSectionClick = (id: string) => {
     setActiveSection(id)
@@ -36,6 +36,20 @@ export function MobileBuilderNav() {
 
   const handleExportPDF = async () => {
     const success = await triggerPdf()
+    if (success) {
+      setOpen(false)
+    }
+  }
+
+  const handleExportDocx = async () => {
+    const success = await triggerDocx()
+    if (success) {
+      setOpen(false)
+    }
+  }
+
+  const handleExportTxt = async () => {
+    const success = await triggerTxt()
     if (success) {
       setOpen(false)
     }
@@ -136,6 +150,24 @@ export function MobileBuilderNav() {
                 >
                   <FileText className="w-4 h-4 text-rose-500" />
                   {isExporting ? "Generating PDF..." : "Export as PDF"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start gap-2 h-9 text-xs"
+                  onClick={handleExportDocx}
+                >
+                  <FileText className="w-4 h-4 text-primary" />
+                  Export as Word (.docx)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start gap-2 h-9 text-xs"
+                  onClick={handleExportTxt}
+                >
+                  <FileText className="w-4 h-4 text-muted-foreground" />
+                  Export as Plain Text
                 </Button>
                 <Button
                   variant="outline"

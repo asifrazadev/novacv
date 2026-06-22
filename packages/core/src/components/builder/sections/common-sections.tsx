@@ -16,23 +16,23 @@ export function AwardsSection() {
     <ListSection
       section="awards"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Title</Label>
               <Input placeholder="Employee of the Month" value={item.title ?? ""} onChange={(e) => updateSectionItem("awards", item.id, "title", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Awarder</Label>
               <Input placeholder="Google" value={item.awarder ?? ""} onChange={(e) => updateSectionItem("awards", item.id, "awarder", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Date</Label>
               <Input placeholder="Jan 2024" value={item.date ?? ""} onChange={(e) => updateSectionItem("awards", item.id, "date", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Website URL</Label>
               <div className="relative">
                 <Link className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -62,23 +62,23 @@ export function CertificationsSection() {
     <ListSection
       section="certifications"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Title</Label>
               <Input placeholder="AWS Solutions Architect" value={item.name ?? ""} onChange={(e) => updateSectionItem("certifications", item.id, "name", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Issuer</Label>
               <Input placeholder="Amazon Web Services" value={item.issuer ?? ""} onChange={(e) => updateSectionItem("certifications", item.id, "issuer", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Date</Label>
               <Input placeholder="Jan 2024" value={item.date ?? ""} onChange={(e) => updateSectionItem("certifications", item.id, "date", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Website URL</Label>
               <div className="relative">
                 <Link className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -109,9 +109,9 @@ export function VolunteerSection() {
       section="volunteer"
       renderForm={(item) => (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label className="text-xs">Organization</Label><Input value={item.organization ?? ""} onChange={(e) => updateSectionItem("volunteer", item.id, "organization", e.target.value)} /></div>
-            <div className="space-y-1.5"><Label className="text-xs">Position</Label><Input value={item.position ?? ""} onChange={(e) => updateSectionItem("volunteer", item.id, "position", e.target.value)} /></div>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5"><Label className="text-xs">Organization</Label><Input value={item.organization ?? ""} onChange={(e) => updateSectionItem("volunteer", item.id, "organization", e.target.value)} /></div>
+            <div className="flex-1 min-w-[130px] space-y-1.5"><Label className="text-xs">Position</Label><Input value={item.position ?? ""} onChange={(e) => updateSectionItem("volunteer", item.id, "position", e.target.value)} /></div>
           </div>
           <DateRange section="volunteer" item={item} />
           <div className="space-y-1.5">
@@ -143,23 +143,23 @@ export function PublicationsSection() {
     <ListSection
       section="publications"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Title</Label>
               <Input placeholder="Mastering Next.js" value={item.name ?? ""} onChange={(e) => updateSectionItem("publications", item.id, "name", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Publisher</Label>
               <Input placeholder="O'Reilly" value={item.publisher ?? ""} onChange={(e) => updateSectionItem("publications", item.id, "publisher", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Date</Label>
               <Input placeholder="Jan 2024" value={item.date ?? ""} onChange={(e) => updateSectionItem("publications", item.id, "date", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Website URL</Label>
               <div className="relative">
                 <Link className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -189,23 +189,23 @@ export function ReferencesSection() {
     <ListSection
       section="references"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Name</Label>
               <Input placeholder="John Doe" value={item.name ?? ""} onChange={(e) => updateSectionItem("references", item.id, "name", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Position</Label>
               <Input placeholder="Senior Manager" value={item.position ?? ""} onChange={(e) => updateSectionItem("references", item.id, "position", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Phone</Label>
               <Input placeholder="+1..." value={item.phone ?? ""} onChange={(e) => updateSectionItem("references", item.id, "phone", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex-1 min-w-[130px] space-y-1.5">
               <Label className="text-xs">Email</Label>
               <Input placeholder="john@company.com" value={item.email ?? ""} onChange={(e) => updateSectionItem("references", item.id, "email", e.target.value)} />
             </div>

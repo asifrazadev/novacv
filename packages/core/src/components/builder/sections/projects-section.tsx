@@ -15,9 +15,9 @@ export function ProjectsSection() {
     <ListSection
       section="projects"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Name</Label>
               <Input placeholder="My Awesome Project" value={item.name ?? ""} onChange={(e) => updateSectionItem("projects", item.id, "name", e.target.value)} />
             </div>

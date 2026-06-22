@@ -113,7 +113,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                                 <div key={i} data-item-id={exp.id} className="section-item">
                                     {/* Row 1: Company + Location */}
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.9em]">
+                                        <span className="font-bold text-[0.9em] w-[80%]">
                                             <LinkedTitle
                                                 show={exp.showLinkInTitle}
                                                 url={exp.website}
@@ -180,7 +180,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((edu, i) => (
                                 <div key={i} data-item-id={edu.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.9em]">
+                                        <span className="font-bold text-[0.9em] w-[80%]">
                                             <LinkedTitle
                                                 show={edu.showLinkInTitle}
                                                 url={edu.website}
@@ -226,7 +226,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((proj, i) => (
                                 <div key={i} data-item-id={proj.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.9em]">
+                                        <span className="font-bold text-[0.9em] w-[80%]">
                                             <LinkedTitle
                                                 show={proj.showLinkInTitle}
                                                 url={proj.url}
@@ -332,7 +332,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((vol, i) => (
                                 <div key={i} data-item-id={vol.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.9em]">
+                                        <span className="font-bold text-[0.9em] w-[80%]">
                                             <LinkedTitle
                                                 show={vol.showLinkInTitle}
                                                 url={vol.website}
@@ -371,7 +371,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((a, i) => (
                                 <div key={i} data-item-id={a.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.82em]">
+                                        <span className="font-bold text-[0.82em] w-[80%]">
                                             <LinkedTitle
                                                 show={a.showLinkInTitle}
                                                 url={a.url}
@@ -402,7 +402,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((c, i) => (
                                 <div key={i} data-item-id={c.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.82em]">
+                                        <span className="font-bold text-[0.82em] w-[80%]">
                                             <LinkedTitle
                                                 show={c.showLinkInTitle}
                                                 url={c.url}
@@ -439,7 +439,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                             {items.map((pub, i) => (
                                 <div key={i} data-item-id={pub.id} className="section-item">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="font-bold text-[0.82em]">
+                                        <span className="font-bold text-[0.82em] w-[80%]">
                                             <LinkedTitle
                                                 show={pub.showLinkInTitle}
                                                 url={pub.url}
@@ -524,7 +524,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
                                 {items.map((item: any, i: number) => (
                                     <div key={i} data-item-id={item.id} className="section-item">
                                         <div className="flex justify-between items-baseline">
-                                            <span className="font-bold text-[0.9em]">
+                                            <span className="font-bold text-[0.9em] w-[80%]">
                                                 <LinkedTitle
                                                     show={!!item.url}
                                                     url={item.url}
@@ -638,7 +638,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
             )}
 
             {/* ── Body: single full-width column (Jake has no sidebar) ────────────── */}
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-4 min-w-0">
                 {mainSections.map((ref: any) => (
                     <React.Fragment key={ref.id}>{renderSection(ref)}</React.Fragment>
                 ))}

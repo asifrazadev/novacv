@@ -83,8 +83,18 @@ export function BuilderMain() {
     }
   }, [])
 
-  const startResizing = React.useCallback(() => setIsResizing(true), [])
-  const stopResizing = React.useCallback(() => setIsResizing(false), [])
+  const startResizing = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [])
+
+  const stopResizing = React.useCallback(() => {
+    setIsResizing(false)
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }, [])
 
   const resize = React.useCallback((e: MouseEvent) => {
     if (isResizing) {

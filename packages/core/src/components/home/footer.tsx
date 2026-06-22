@@ -10,14 +10,16 @@ const GITHUB_URL = "https://github.com/asifrazadev/novacv"
 export function Footer() {
   return (
     <footer className="py-8 border-t border-border/40">
-      <div className="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
+      <div className="container mx-auto px-6 flex flex-col md:flex-row items-center md:justify-between gap-6 text-xs text-muted-foreground">
+        <div className="flex flex-col md:flex-row items-center gap-3 md:gap-2">
           <LogoIcon className="w-10 h-10" />
-          <span>NovaCV</span>
-          <span className="text-border">·</span>
-          <span>MIT License</span>
+          <div className="flex items-center gap-2">
+            <span>NovaCV</span>
+            <span className="text-border">·</span>
+            <span>MIT License</span>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 mt-4 sm:mt-0">
+        <div className="flex flex-wrap justify-center items-center gap-4">
           <Link href="/privacy" className="hover:text-foreground p-1 transition-colors">
             Privacy Policy
           </Link>

@@ -15,29 +15,29 @@ export function EducationEditor() {
     <ListSection
       section="education"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex w-full flex-col gap-4">
+          <div className="flex flex-wrap max-w-full gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">School</Label>
               <Input placeholder="MIT, Harvard..." value={item.school ?? ""} onChange={(e) => updateSectionItem("education", item.id, "school", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Area of Study</Label>
               <Input placeholder="Computer Science" value={item.areaOfStudy ?? ""} onChange={(e) => updateSectionItem("education", item.id, "areaOfStudy", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Degree</Label>
               <Input placeholder="Bachelor's, Master's..." value={item.degree ?? ""} onChange={(e) => updateSectionItem("education", item.id, "degree", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Grade</Label>
               <Input placeholder="3.9 GPA, First Class..." value={item.grade ?? ""} onChange={(e) => updateSectionItem("education", item.id, "grade", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Location</Label>
               <Input placeholder="Boston, MA" value={item.location ?? ""} onChange={(e) => updateSectionItem("education", item.id, "location", e.target.value)} />
             </div>

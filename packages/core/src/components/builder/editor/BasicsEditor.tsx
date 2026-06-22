@@ -34,13 +34,13 @@ export function BasicsEditor() {
             <Label className="text-xs font-medium">Show Profile Picture</Label>
             <Switch checked={data.basics.picture?.visible ?? true} onCheckedChange={(val: boolean) => updatePicture("visible", val)} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2 text-xs"><Label>Size ({data.basics.picture?.size ?? 64}px)</Label><Slider value={[data.basics.picture?.size ?? 64]} onValueChange={([val]) => updatePicture("size", val)} min={32} max={200} /></div>
-            <div className="space-y-2 text-xs"><Label>Radius ({data.basics.picture?.borderRadius ?? 0}%)</Label><Slider value={[data.basics.picture?.borderRadius ?? 0]} onValueChange={([val]) => updatePicture("borderRadius", val)} min={0} max={100} /></div>
+          <div className="flex flex-wrap gap-4">
+            <div className="space-y-2 text-xs flex-1 min-w-[130px]"><Label>Size ({data.basics.picture?.size ?? 64}px)</Label><Slider value={[data.basics.picture?.size ?? 64]} onValueChange={([val]) => updatePicture("size", val)} min={32} max={200} /></div>
+            <div className="space-y-2 text-xs flex-1 min-w-[130px]"><Label>Radius ({data.basics.picture?.borderRadius ?? 0}%)</Label><Slider value={[data.basics.picture?.borderRadius ?? 0]} onValueChange={([val]) => updatePicture("borderRadius", val)} min={0} max={100} /></div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2 text-xs"><Label>Rotation ({data.basics.picture?.rotation ?? 0}°)</Label><Slider value={[data.basics.picture?.rotation ?? 0]} onValueChange={([val]) => updatePicture("rotation", val)} min={-180} max={180} /></div>
-            <div className="space-y-2 text-xs"><Label>Shadow ({data.basics.picture?.shadow ?? 0}px)</Label><Slider value={[data.basics.picture?.shadow ?? 0]} onValueChange={([val]) => updatePicture("shadow", val)} min={0} max={20} /></div>
+          <div className="flex flex-wrap gap-4">
+            <div className="space-y-2 text-xs flex-1 min-w-[130px]"><Label>Rotation ({data.basics.picture?.rotation ?? 0}°)</Label><Slider value={[data.basics.picture?.rotation ?? 0]} onValueChange={([val]) => updatePicture("rotation", val)} min={-180} max={180} /></div>
+            <div className="space-y-2 text-xs flex-1 min-w-[130px]"><Label>Shadow ({data.basics.picture?.shadow ?? 0}px)</Label><Slider value={[data.basics.picture?.shadow ?? 0]} onValueChange={([val]) => updatePicture("shadow", val)} min={0} max={20} /></div>
           </div>
           <div className="flex items-center justify-between"><Label className="text-xs">Grayscale</Label><Switch checked={data.basics.picture?.grayscale ?? false} onCheckedChange={(val: boolean) => updatePicture("grayscale", val)} /></div>
         </div>

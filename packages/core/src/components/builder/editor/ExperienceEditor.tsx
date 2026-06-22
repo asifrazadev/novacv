@@ -17,19 +17,19 @@ export function ExperienceEditor() {
     <ListSection
       section="experience"
       renderForm={(item) => (
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[100px]">
               <Label className="text-xs">Company</Label>
               <Input placeholder="Google, Meta..." value={item.company ?? ""} onChange={(e) => updateSectionItem("experience", item.id, "company", e.target.value)} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Location</Label>
               <Input placeholder="New York, Remote..." value={item.location ?? ""} onChange={(e) => updateSectionItem("experience", item.id, "location", e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-3">
+            <div className="space-y-1.5 flex-1 min-w-[130px]">
               <Label className="text-xs">Position</Label>
               <Input placeholder="Software Engineer" value={item.position ?? ""} onChange={(e) => updateSectionItem("experience", item.id, "position", e.target.value)} />
             </div>
@@ -76,8 +76,8 @@ export function ExperienceEditor() {
                   <div key={role.id} className="flex flex-col gap-2 p-3 bg-muted/30 border border-border/40 rounded-xl">
                     <div className="flex items-start gap-2">
                       <GripVertical className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-2" />
-                      <div className="flex-1 grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
+                      <div className="flex-1 flex flex-wrap gap-2">
+                        <div className="space-y-1 flex-1 min-w-[130px]">
                           <Label className="text-[10px] font-semibold text-muted-foreground">Title</Label>
                           <Input
                             className="h-7 text-xs"
@@ -89,7 +89,7 @@ export function ExperienceEditor() {
                             }}
                           />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1 min-w-[130px]">
                           <Label className="text-[10px] font-semibold text-muted-foreground">Duration</Label>
                           <div className="grid gap-1">
                             <div className="flex gap-1">

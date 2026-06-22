@@ -49,30 +49,30 @@ export function Hero() {
 
             {/* Tiny Floating Badges */}
             <div className="mt-5 flex flex-wrap gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/25 bg-primary/5 text-xs font-semibold text-primary select-none">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-primary/25 bg-primary/5 text-xs font-semibold text-primary select-none">
                 MIT Licensed
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border bg-muted/40 text-xs font-medium text-muted-foreground select-none">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-border bg-muted/40 text-xs font-medium text-muted-foreground select-none">
                 Open Source
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-success/25 bg-success/5 text-xs font-semibold text-success select-none">
+              {/* <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-success/25 bg-success/5 text-xs font-semibold text-success select-none">
                 10k+ Resumes
-              </span>
+              </span> */}
             </div>
 
             {/* Social Proof */}
-            <div className="mt-8 flex items-center gap-4 text-sm text-muted-foreground">
+            {/* <div className="mt-8 flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex -space-x-3">
-                <div className="w-8 h-8 rounded-full bg-[#FFB3B3] border-2 border-background" />
-                <div className="w-8 h-8 rounded-full bg-[#FFDF73] border-2 border-background" />
-                <div className="w-8 h-8 rounded-full bg-[#85E0A3] border-2 border-background" />
-                <div className="w-8 h-8 rounded-full bg-[#99C2FF] border-2 border-background" />
-                <div className="w-8 h-8 rounded-full bg-[#C2B3FF] border-2 border-background" />
+                <div className="w-8 h-8 rounded-full bg-[#FFB3B3] border-2 border-background flex items-center justify-center text-[11px] font-bold text-black/60">A</div>
+                <div className="w-8 h-8 rounded-full bg-[#FFDF73] border-2 border-background flex items-center justify-center text-[11px] font-bold text-black/60">S</div>
+                <div className="w-8 h-8 rounded-full bg-[#85E0A3] border-2 border-background flex items-center justify-center text-[11px] font-bold text-black/60">M</div>
+                <div className="w-8 h-8 rounded-full bg-[#99C2FF] border-2 border-background flex items-center justify-center text-[11px] font-bold text-black/60">K</div>
+                <div className="w-8 h-8 rounded-full bg-[#C2B3FF] border-2 border-background flex items-center justify-center text-[11px] font-bold text-black/60">R</div>
               </div>
               <p>
                 <strong className="text-foreground font-semibold">10,000+ resumes built</strong> · 95% score above 80 on ATS
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Column: Visual Mockup */}

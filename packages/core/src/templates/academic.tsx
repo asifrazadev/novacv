@@ -66,9 +66,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
 
   // ── Two-column row: left content, right aligned text ─────────────────────
   const Row = ({ left, right }: { left: React.ReactNode; right?: React.ReactNode }) => (
-    <div className="flex justify-between items-baseline gap-2">
+    <div className="flex justify-between items-baseline gap-2 ">
       <div className="flex-1 min-w-0">{left}</div>
-      {right && <div className="shrink-0 text-right">{right}</div>}
+      {right && <div className="shrink-0 text-right pl-3 min-w-fit">{right}</div>}
     </div>
   )
 
@@ -179,7 +179,7 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                 <div key={i} data-item-id={exp.id} className="section-item">
                   <Row
                     left={
-                      <span className="font-bold text-[0.9em]">
+                      <span className="font-bold text-[0.9em] ">
                         <LinkedTitle
                           show={exp.showLinkInTitle}
                           url={exp.website}
@@ -448,7 +448,7 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
             <SectionHeading>References</SectionHeading>
             <div className="mt-1 grid grid-cols-2 gap-4">
               {items.map((ref, i) => (
-                <div key={i} data-item-id={ref.id} className="section-item text-[0.82em]">
+                <div key={i} data-item-id={ref.id} className="section-item text-[0.82em] min-w-0">
                   <div className="font-bold">{ref.name}</div>
                   <div className="italic opacity-75">{ref.position}</div>
                   {ref.email && <div className="opacity-65">{ref.email}</div>}
@@ -619,7 +619,7 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
       )}
 
       {/* ── Body: single column ───────────────────────────────────────────── */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         {mainSections.map((ref: any) => (
           <React.Fragment key={ref.id}>{renderSection(ref)}</React.Fragment>
         ))}

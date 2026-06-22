@@ -215,8 +215,8 @@ export function AiRewriter() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex-1 min-w-[130px] space-y-1.5">
             <Label className="text-xs">Style / Tone</Label>
             <Select value={tone} onValueChange={setTone}>
               <SelectTrigger className="h-9 text-xs rounded-lg border-border/60">
@@ -231,7 +231,7 @@ export function AiRewriter() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-end">
+          <div className="flex-1 min-w-[130px] flex items-end">
             <Button
               className="w-full h-9 gap-1.5 text-xs rounded-lg bg-foreground text-background hover:bg-foreground/90 font-semibold"
               onClick={handleRewrite}

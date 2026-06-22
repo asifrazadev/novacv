@@ -34,75 +34,75 @@ export function AuthLayout({
   alternateLinkLabel
 }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-background font-sans">
-      {/* LEFT PANEL */}
-      <div className="hidden md:flex flex-col justify-between p-10 bg-muted/30 border-r border-border/40">
-        <Link href="/" className="flex items-center w-44 h-auto gap-2 group hover:opacity-90 transition-opacity">
-          <TextLogo className="w-44 h-11" />
-        </Link>
-
-        {/* Tagline + chips */}
-        <div className="space-y-6">
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-            <span className="text-foreground font-medium">AI-powered resume builder.</span>{" "}
-            Real-time preview, ATS-friendly templates, and instant PDF export. Free and open source.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {defaultStack.map((s) => (
-              <span
-                key={s}
-                className="text-[11px] font-mono text-muted-foreground border border-border/40 rounded px-2 py-0.5"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
+    <div>
+      <div className="flex items-center justify-between px-2 md:px-8 py-4 border-b border-border/40">
+        <TextLogo className=" w-32 h-11" />
+        <div className="ml-auto flex items-center gap-3">
+          {alternateText && alternateLink && alternateLinkLabel && (
+            <>
+              <span className=" hidden md:block text-xs text-muted-foreground">{alternateText}</span>
+              <Button asChild variant="outline" size="sm" className="h-8 text-xs rounded-md border-border/80 px-4">
+                <Link href={alternateLink}>{alternateLinkLabel}</Link>
+              </Button>
+            </>
+          )}
+          <ThemeToggle />
         </div>
-
-        {/* GitHub link */}
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors w-fit"
-        >
-          <GitHubIcon />
-          github.com/asifraza/novacv
-        </a>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="flex flex-col">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-8 py-4 border-b border-border/40">
-          <Link href="/" className="flex items-center gap-2 group md:hidden">
-            <TextLogo className="w-32" />
-          </Link>
-          <div className="ml-auto flex items-center gap-3">
-            {alternateText && alternateLink && alternateLinkLabel && (
-              <>
-                <span className="text-xs text-muted-foreground">{alternateText}</span>
-                <Button asChild variant="outline" size="sm" className="h-8 text-xs rounded-md border-border/80 px-4">
-                  <Link href={alternateLink}>{alternateLinkLabel}</Link>
-                </Button>
-              </>
-            )}
-            <ThemeToggle />
+      <div className="min-h-screen grid md:grid-cols-2 bg-background font-sans">
+
+        {/* LEFT PANEL */}
+        <div className="hidden md:flex flex-col justify-between p-10 bg-muted/30 border-r border-border/40">
+          {/* Tagline + chips */}
+          <div></div>
+          <div className="space-y-6">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+              <span className="text-foreground font-medium">AI-powered resume builder.</span>{" "}
+              Real-time preview, ATS-friendly templates, and instant PDF export. Free and open source.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {defaultStack.map((s) => (
+                <span
+                  key={s}
+                  className="text-[11px] font-mono text-muted-foreground border border-border/40 rounded px-2 py-0.5"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
           </div>
+
+          {/* GitHub link */}
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center align-baseline gap-2 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors w-fit"
+          >
+            <GitHubIcon />
+            github.com/asifraza/novacv
+          </a>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 flex items-center justify-center px-8 py-12">
-          <div className="w-full max-w-sm space-y-6">
-            <div className="space-y-1">
-              <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-widest">
-                {welcomeLabel}
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-              <p className="text-sm text-muted-foreground">{subtitle}</p>
-            </div>
+        {/* RIGHT PANEL */}
+        <div className="flex flex-col">
+          {/* Top bar */}
 
-            {children}
+
+          {/* Content Area */}
+          <div className="flex-1 flex items-center justify-center px-8 py-12">
+            <div className="w-full max-w-sm space-y-6">
+              <div className="space-y-1">
+                <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-widest">
+                  {welcomeLabel}
+                </p>
+                <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+                <p className="text-sm text-muted-foreground">{subtitle}</p>
+              </div>
+
+              {children}
+            </div>
           </div>
         </div>
       </div>

@@ -83,15 +83,15 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
 
         return items.length > 0 ? (
           <section key={id} data-section-id={id} className="section-block">
-            <SectionHeading className="mb-4">
+            <SectionHeading className="mb-4  ">
               {t("experience")} {isContinued && <span className="text-[10px] opacity-40 lowercase ml-2">{t("continued")}</span>}
             </SectionHeading>
             <div className="space-y-6">
               {items.map((exp, index) => (
                 <div key={index} data-item-id={exp.id} className="section-item space-y-2">
                   <div className="flex justify-between items-baseline">
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-base font-bold">
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h3 className="text-base font-bold text-wrap w-full ">
                         <LinkedTitle
                           show={exp.showLinkInTitle}
                           url={exp.website}
@@ -154,14 +154,16 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((edu, index) => (
                 <div key={index} data-item-id={edu.id} className="section-item space-y-1">
                   <div className="flex justify-between items-baseline">
-                    <h3 className="text-base font-bold">
-                      <LinkedTitle
-                        show={edu.showLinkInTitle}
-                        url={edu.website}
-                        fallback={edu.school}
-                        color="var(--primary)"
-                      />
-                    </h3>
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h3 className="text-base font-bold text-wrap w-full">
+                        <LinkedTitle
+                          show={edu.showLinkInTitle}
+                          url={edu.website}
+                          fallback={edu.school}
+                          color="var(--primary)"
+                        />
+                      </h3>
+                    </div>
                     <span className="text-xs opacity-55 font-medium shrink-0">{formatDateRange(edu)}</span>
                   </div>
                   <div className="flex justify-between items-baseline opacity-80">
@@ -270,8 +272,8 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((proj, index) => (
                 <div key={index} data-item-id={proj.id} className="section-item space-y-1.5">
                   <div className="flex justify-between items-baseline">
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-base font-bold">
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h3 className="text-base font-bold text-wrap w-full">
                         <LinkedTitle
                           show={proj.showLinkInTitle}
                           url={proj.url}
@@ -309,8 +311,8 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((vol, index) => (
                 <div key={index} data-item-id={vol.id} className="section-item space-y-1.5">
                   <div className="flex justify-between items-baseline">
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-base font-bold">
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h3 className="text-base font-bold text-wrap w-full">
                         <LinkedTitle
                           show={vol.showLinkInTitle}
                           url={vol.website}
@@ -349,7 +351,8 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((a, index) => (
                 <div key={index} data-item-id={a.id} className="section-item space-y-1">
                   <div className="flex justify-between items-baseline">
-                    <h4 className="text-sm font-bold">
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h4 className="text-sm font-bold text-wrap w-full">
                         <LinkedTitle
                           show={a.showLinkInTitle}
                           url={a.url}
@@ -357,6 +360,7 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
                           color="var(--primary)"
                         />
                       </h4>
+                    </div>
                     <span className="text-[10px] opacity-45 font-medium shrink-0 ml-2">{a.date}</span>
                   </div>
                   <p className="text-xs opacity-70 italic">{a.awarder}</p>
@@ -381,7 +385,8 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((c, index) => (
                 <div key={index} data-item-id={c.id} className="section-item space-y-1">
                   <div className="flex justify-between items-baseline">
-                    <h4 className="text-sm font-bold">
+                    <div className="flex items-baseline gap-2 w-[80%]">
+                      <h4 className="text-sm font-bold text-wrap w-full">
                         <LinkedTitle
                           show={c.showLinkInTitle}
                           url={c.url}
@@ -389,6 +394,7 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
                           color="var(--primary)"
                         />
                       </h4>
+                    </div>
                     <span className="text-[10px] opacity-45 font-medium shrink-0 ml-2">{c.date}</span>
                   </div>
                   <p className="text-xs opacity-70 italic">{c.issuer}</p>
@@ -460,14 +466,16 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
                 {items.map((item: any, index: number) => (
                   <div key={index} data-item-id={item.id} className="section-item space-y-1">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="text-base font-bold">
-                        <LinkedTitle
-                          show={!!item.url}
-                          url={item.url}
-                          fallback={item.title}
-                          color="var(--primary)"
-                        />
-                      </h3>
+                      <div className="flex items-baseline gap-2 w-[80%]">
+                        <h3 className="text-base font-bold text-wrap w-full">
+                          <LinkedTitle
+                            show={!!item.url}
+                            url={item.url}
+                            fallback={item.title}
+                            color="var(--primary)"
+                          />
+                        </h3>
+                      </div>
                       <span className="text-xs opacity-55 font-medium shrink-0">{formatDateRange(item)}</span>
                     </div>
                     <div className="flex justify-between items-baseline opacity-80">
@@ -535,7 +543,7 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
 
       <div className="flex-1 grid grid-cols-12 gap-8">
         {/* Main Column */}
-        <div className={cn(layout.sidebar.length > 0 ? "col-span-8" : "col-span-12", "space-y-8")}>
+        <div className={cn(layout.sidebar.length > 0 ? "col-span-8" : "col-span-12", "space-y-8 min-w-0")}>
           {mainSections.map((ref: any) => (
             <React.Fragment key={ref.id}>{renderSection(ref)}</React.Fragment>
           ))}
@@ -543,7 +551,7 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
 
         {/* Sidebar Column */}
         {layout.sidebar.length > 0 && (
-          <div className="col-span-4 space-y-8 border-l pl-8 h-full min-h-[500px]">
+          <div className="col-span-4 space-y-8 border-l pl-8 h-full min-h-[500px] min-w-0">
             {sidebarSections.map((ref: any) => (
               <React.Fragment key={ref.id}>{renderSection(ref)}</React.Fragment>
             ))}
