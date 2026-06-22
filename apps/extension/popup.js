@@ -4,13 +4,14 @@ const LOGIN_URL = CONFIG.LOGIN_URL;
 // Elements
 const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
+const initLoading = document.getElementById('init-loading');
 const loginBtn = document.getElementById('login-btn');
+const authWaiting = document.getElementById('auth-waiting');
 
 const navTracker = document.getElementById('nav-tracker');
 const navResumes = document.getElementById('nav-resumes');
 const panelTracker = document.getElementById('panel-tracker');
 const panelResumes = document.getElementById('panel-resumes');
-
 
 // Tracker Elements
 const companyInput = document.getElementById('company');
@@ -31,8 +32,80 @@ const resumesList = document.getElementById('resumes-list');
 let currentUrl = '';
 let currentJobDescription = '';
 let autoFilled = false;
+let authPollInterval = null;
 
-// Helpers
+// ── View helpers ────────────────────────────────────────────────
+function showAppView() {
+  initLoading.style.display = 'none';
+  authView.classList.add('hidden');
+  appView.classList.remove('hidden');
+  stopAuthPolling();
+}
+
+function showAuthView() {
+  initLoading.style.display = 'none';
+  appView.classList.add('hidden');
+  authView.classList.remove('hidden');
+}
+
+// ── Auth polling — fires every 2.5s while auth-view is shown ────
+function startAuthPolling() {
+  if (authPollInterval) return;
+  authWaiting.classList.remove('hidden');
+  authPollInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_URL_BASE}/resumes`, {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store'
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        stopAuthPolling();
+        showAppView();
+        extractAndFill();
+      }
+    } catch { /* still offline or not signed in */ }
+  }, 2500);
+}
+
+function stopAuthPolling() {
+  if (authPollInterval) {
+    clearInterval(authPollInterval);
+    authPollInterval = null;
+  }
+  authWaiting.classList.add('hidden');
+}
+
+// ── Auth gate — first thing that runs on popup open ──────────────
+async function initExtension() {
+  // initLoading is visible by default (from HTML), so no extra show needed
+  try {
+    const res = await fetch(`${API_URL_BASE}/resumes`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store'
+    });
+
+    // Parse the JSON to guarantee we are actually receiving the success payload
+    // and not an unexpected HTML page or cached redirect
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.success) {
+      showAppView();
+      extractAndFill();
+    } else {
+      console.log('Auth failed:', res.status, data);
+      showAuthView();
+    }
+  } catch (err) {
+    // Network error or extension offline — show auth screen
+    console.error('Extension init error:', err);
+    showAuthView();
+  }
+}
+
+// ── Generic helpers ──────────────────────────────────────────────
 function showLoading(text = 'Processing...') {
   loadingText.textContent = text;
   loadingOverlay.classList.remove('hidden');
@@ -49,9 +122,10 @@ function showMsg(msg, type = 'info') {
   setTimeout(() => statusMsg.classList.add('hidden'), 4000);
 }
 
-// Auth
+// Auth — open login tab and start polling for session
 loginBtn.addEventListener('click', () => {
   chrome.tabs.create({ url: LOGIN_URL });
+  startAuthPolling();
 });
 
 // Main Nav
@@ -74,7 +148,7 @@ navResumes.addEventListener('click', () => {
 async function extractAndFill() {
   if (autoFilled) return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  
+
   try {
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -105,8 +179,9 @@ async function extractAndFill() {
   }
 }
 
-// Initial
-extractAndFill();
+// ── Entry point ─────────────────────────────────────────────────
+initExtension();
+checkForUpdates();
 
 // Save Job Application
 saveBtn.addEventListener('click', async () => {
@@ -131,20 +206,19 @@ saveBtn.addEventListener('click', async () => {
     const res = await fetch(`${API_URL_BASE}/jobs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', 
+      credentials: 'include',
       body: JSON.stringify(payload)
     });
 
     if (res.status === 401) {
-      appView.classList.add('hidden');
-      authView.classList.remove('hidden');
       hideLoading();
+      showAuthView();
       return;
     }
 
     const json = await res.json();
     hideLoading();
-    
+
     if (res.ok && json.success) {
       showMsg('Saved to Kanban board!', 'success');
       setTimeout(() => window.close(), 1500);
@@ -160,7 +234,7 @@ saveBtn.addEventListener('click', async () => {
 // Load Resumes List
 async function loadResumes() {
   resumesList.innerHTML = '<div class="text-center" style="font-size:12px; color:var(--muted); padding:20px 0;">Loading resumes...</div>';
-  
+
   try {
     const res = await fetch(`${API_URL_BASE}/resumes`, {
       method: 'GET',
@@ -168,13 +242,12 @@ async function loadResumes() {
     });
 
     if (res.status === 401) {
-      appView.classList.add('hidden');
-      authView.classList.remove('hidden');
+      showAuthView();
       return;
     }
 
     const json = await res.json();
-    
+
     if (res.ok && json.success) {
       renderResumes(json.resumes);
     } else {
@@ -197,7 +270,6 @@ function renderResumes(resumes) {
       <div class="resume-meta">Updated: ${new Date(r.updated_at).toLocaleDateString()}</div>
       <div class="resume-actions" style="margin-top: 10px; display: flex; justify-content: flex-end; align-items: center;">
          <div style="display: flex; gap: 8px;">
-           <button class="btn btn-secondary fill-form-btn" data-resume-id="${r.id}" style="padding: 6px 10px; font-size: 11px; width: auto;">Auto-Fill</button>
            <button class="btn btn-secondary pdf-btn" data-resume-id="${r.id}" style="padding: 6px 10px; font-size: 11px; width: auto;">PDF</button>
          </div>
       </div>
@@ -211,17 +283,17 @@ function renderResumes(resumes) {
       const resumeId = e.target.getAttribute('data-resume-id');
       const pdfUrl = `${CONFIG.BASE_URL}/api/resumes/${resumeId}/pdf`;
       showLoading('Generating PDF...');
-      
+
       try {
         const res = await fetch(pdfUrl, { credentials: 'include' });
         if (!res.ok) throw new Error("Failed to generate PDF");
-        
+
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
-        
+
         chrome.downloads.download({
           url: objectUrl,
-          filename: `NovaCV_Resume_${resumeId.substring(0,6)}.pdf`,
+          filename: `NovaCV_Resume_${resumeId.substring(0, 6)}.pdf`,
           saveAs: true
         }, () => {
           hideLoading();
@@ -235,14 +307,14 @@ function renderResumes(resumes) {
   });
 }
 
-  // Attach event listeners for auto-fill buttons
-  const fillBtns = resumesList.querySelectorAll('.fill-form-btn');
-  fillBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const resumeId = e.target.getAttribute('data-resume-id');
-      fillFormWithResume(resumeId);
-    });
+// Attach event listeners for auto-fill buttons
+const fillBtns = resumesList.querySelectorAll('.fill-form-btn');
+fillBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const resumeId = e.target.getAttribute('data-resume-id');
+    fillFormWithResume(resumeId);
   });
+});
 
 async function fillFormWithResume(resumeId) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -268,7 +340,7 @@ async function fillFormWithResume(resumeId) {
     }
 
     showLoading('AI is mapping your resume to the form...');
-    
+
     try {
       const res = await fetch(`${API_URL_BASE}/autofill`, {
         method: 'POST',
@@ -282,11 +354,11 @@ async function fillFormWithResume(resumeId) {
 
       if (res.ok && json.success) {
         showMsg("Mapping complete! Filling form...", "success");
-        
+
         // Send mappings to content.js to perform the actual DOM updates
-        chrome.tabs.sendMessage(tab.id, { 
-          action: "fillForm", 
-          mappings: json.fields 
+        chrome.tabs.sendMessage(tab.id, {
+          action: "fillForm",
+          mappings: json.fields
         }, (response) => {
           if (response && response.success) {
             showMsg("Form successfully auto-filled!", "success");
@@ -314,7 +386,7 @@ async function checkForUpdates() {
     if (res.ok) {
       const data = await res.json();
       const currentVersion = chrome.runtime.getManifest().version;
-      
+
       if (data.version && currentVersion !== data.version) {
         showUpdateBanner(data);
       }
@@ -351,5 +423,4 @@ function showUpdateBanner(updateData) {
   }
 }
 
-// Initial update check
-checkForUpdates();
+// Initial update check is called in initExtension entry point above

@@ -298,8 +298,18 @@
       style="background: white; color: var(--primary); padding: 8px; font-size: 12px;">Update Extension</button>
   </div>
 
+  <!-- Init Loading Screen (shown while checking auth) -->
+  <div id="init-loading"
+    style="position:absolute; inset:0; background:var(--background); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:100;">
+    <img src="logo.png" alt="NovaCV" style="width:6rem; opacity:0.8;">
+    <div style="display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px; font-weight:500;">
+      <div class="spinner"></div>
+      Connecting...
+    </div>
+  </div>
+
   <!-- Main App View -->
-  <div id="app-view">
+  <div id="app-view" class="hidden">
     <!-- Main Tabs -->
     <div class="main-tabs">
       <div id="nav-tracker" class="main-tab active">Job Tracker</div>
@@ -380,19 +390,25 @@
     </div>
   </div>
 
-  <!-- Auth View -->
+  <!-- Auth View (shown when not signed in) -->
   <div id="auth-view" class="hidden"
-    style="padding: 30px 20px; text-align: center; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted)"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;">
-      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-    </svg>
-    <h3 style="margin:0 0 10px 0; font-weight:700;">Authentication Required</h3>
-    <p style="font-size:13px; color:var(--muted); line-height:1.5; margin-bottom:20px;">
-      Please log in to your NovaCV dashboard to save jobs directly to your board.
+    style="padding: 0 20px 30px; text-align: center; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0;">
+    <img src="logo.png" alt="NovaCV" style="width:7rem; margin-bottom:20px;">
+    <p style="font-size:13px; color:var(--muted); line-height:1.6; margin:0 0 24px 0; max-width:240px;">
+      Sign in to NovaCV to save jobs and auto-fill applications.
     </p>
-    <button id="login-btn" class="btn">Login to NovaCV</button>
+    <button id="login-btn" class="btn" style="max-width:220px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Sign in to NovaCV
+    </button>
+    <p id="auth-waiting" class="hidden" style="font-size:11px; color:var(--muted); margin-top:14px; line-height:1.5;">
+      Waiting for sign in...
+    </p>
   </div>
 
   <script src="config.js"></script>
