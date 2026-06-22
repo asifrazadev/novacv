@@ -385,7 +385,7 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
               {items.map((c, index) => (
                 <div key={index} data-item-id={c.id} className="section-item space-y-1">
                   <div className="flex justify-between items-baseline">
-                    <div className="flex items-baseline gap-2 w-[80%]">
+                    <div className="flex items-baseline">
                       <h4 className="text-sm font-bold text-wrap w-full">
                         <LinkedTitle
                           show={c.showLinkInTitle}
@@ -395,9 +395,12 @@ export const ModernTemplate = React.memo(function ModernTemplate({ data, content
                         />
                       </h4>
                     </div>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <p className="text-xs opacity-70 italic">{c.issuer}</p>
                     <span className="text-[10px] opacity-45 font-medium shrink-0 ml-2">{c.date}</span>
                   </div>
-                  <p className="text-xs opacity-70 italic">{c.issuer}</p>
+
                   {!isEmptyHtml(c.description) && (
                     <div
                       className="mt-1 opacity-65 rich-text pl-5 leading-relaxed text-[0.8em]"
