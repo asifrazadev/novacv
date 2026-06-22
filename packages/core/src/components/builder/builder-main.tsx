@@ -140,7 +140,7 @@ export function BuilderMain() {
   }, [tourOpen, setShowAiPanel])
 
   return (
-    <main className="flex-1 flex overflow-hidden relative pb-16 lg:pb-0">
+    <main className="flex-1 max-w-full flex overflow-hidden relative pb-16 lg:pb-0">
       <WelcomeGuide
         storageKey="nova_guide_builder"
         title="Welcome to the Builder"
@@ -161,12 +161,13 @@ export function BuilderMain() {
 
       {/* Editor Panel */}
       <div className={cn(
-        "flex-1 lg:flex-none lg:flex",
-        mobileView === "editor" ? "flex" : "hidden"
+        "min-w-0 overflow-hidden lg:flex-none lg:flex",
+        mobileView === "editor" ? "flex flex-1" : "hidden"
       )}>
         {activeSection !== "" && (
           <SidebarPanel />
-        )}      </div>
+        )}
+      </div>
 
       {/* Preview Canvas */}
       <div className={cn(

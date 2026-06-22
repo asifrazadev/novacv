@@ -2,12 +2,12 @@
 
 import * as React from "react"
 import { useBuilder } from "@/components/builder/builder-context"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/shared/ui/accordion"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/shared/ui/dialog"
 import { Input } from "@/components/shared/ui/input"
 import { Label } from "@/components/shared/ui/label"
 import { Switch } from "@/components/shared/ui/switch"
 import { Button } from "@/components/shared/ui/button"
-import { Trash2, GripVertical } from "lucide-react"
+import { Trash2, GripVertical, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   DndContext,
@@ -78,17 +78,14 @@ export function DateRange({ section, item }: { section: string; item: any }) {
   )
 }
 
-/* ── Sortable Accordion Item Wrapper ── */
-function SortableAccordionItem({
+/* ── Sortable List Item ── */
+function SortableListItem({
   item,
-  section,
-  renderForm,
+  onEdit,
 }: {
   item: any
-  section: string
-  renderForm: (item: any) => React.ReactNode
+  onEdit: () => void
 }) {
-  const { deleteSectionItem } = useBuilder()
   const {
     attributes,
     listeners,
@@ -105,53 +102,47 @@ function SortableAccordionItem({
   }
 
   return (
-    <AccordionItem
+    <div
       ref={setNodeRef}
       style={style}
-      value={item.id}
       className={cn(
-        "border-b-0 mb-2 border w-full rounded-md px-3 bg-card/50 overflow-hidden relative transition-all",
+        "flex items-center border max-w-full rounded-md px-3 py-2.5 bg-card/50 overflow-hidden relative transition-all group hover:border-primary/50",
         isDragging && "opacity-50 ring-2 ring-primary border-primary bg-primary/5 shadow-lg"
       )}
     >
-      <div className="flex items-center w-full">
-        {/* Grab Handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-2.5 -ml-1.5 hover:bg-muted rounded transition-colors touch-none shrink-0"
-        >
-          <GripVertical className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
-        </div>
-
-        <AccordionTrigger className="hover:no-underline w-90 py-3 overflow-hidden flex select-none pr-4">
-          <div className="flex flex-col items-start pr-4 truncate w-full text-left min-w-0 max-w-full">
-            <span className="font-medium text-sm truncate w-full block">
-              {item.company || item.school || item.name || item.title || item.organization || "Untitled"}
-            </span>
-            <span className="text-[11px] text-muted-foreground truncate w-full block">
-              {item.position || item.degree || item.date || item.issuer || item.publisher || ""}
-            </span>
-          </div>
-        </AccordionTrigger>
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-2 -ml-2 mr-1 hover:bg-muted rounded transition-colors touch-none shrink-0"
+      >
+        <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
       </div>
 
-      <AccordionContent className="space-y-4 pb-4 pl-7">
-        {renderForm(item)}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => deleteSectionItem(section as any, item.id)}
-          className="w-full text-destructive hover:bg-destructive/10 h-8 gap-2 mt-4"
-        >
-          <Trash2 className="w-3.5 h-3.5" /> Delete Entry
-        </Button>
-      </AccordionContent>
-    </AccordionItem>
+      <div
+        className="flex flex-col items-start pr-2 truncate w-full text-left min-w-0 max-w-full cursor-pointer"
+        onClick={onEdit}
+      >
+        <span className="font-semibold text-sm truncate w-full block">
+          {item.company || item.school || item.name || item.title || item.organization || "Untitled"}
+        </span>
+        <span className="text-xs font-medium text-muted-foreground truncate w-full block mt-0.5">
+          {item.position || item.degree || item.date || item.issuer || item.publisher || "Click to edit"}
+        </span>
+      </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onEdit}
+        className="shrink-0 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity bg-primary/10 hover:bg-primary/20 text-primary"
+      >
+        <Pencil className="w-3.5 h-3.5" />
+      </Button>
+    </div>
   )
 }
 
-/* ── ListSection — shared accordion wrapper for all list-type sections ── */
+/* ── ListSection — shared wrapper for all list-type sections ── */
 export function ListSection({
   section,
   renderForm,
@@ -159,8 +150,21 @@ export function ListSection({
   section: string
   renderForm: (item: any) => React.ReactNode
 }) {
-  const { data, reorderSectionItems } = useBuilder()
+  const { data, reorderSectionItems, deleteSectionItem } = useBuilder()
   const items = (data.sections[section as keyof typeof data.sections] as any[]) || []
+
+  const [editingItemId, setEditingItemId] = React.useState<string | null>(null)
+  const previousLengthRef = React.useRef(items.length)
+
+  // Auto-open dialog when a new item is added
+  React.useEffect(() => {
+    if (items.length > previousLengthRef.current) {
+      setEditingItemId(items[items.length - 1].id)
+    }
+    previousLengthRef.current = items.length
+  }, [items.length, items])
+
+  const activeItem = React.useMemo(() => items.find(i => i.id === editingItemId), [items, editingItemId])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -187,23 +191,58 @@ export function ListSection({
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-        <Accordion type="single" collapsible className="!w-full">
-          {items.map((item) => (
-            <SortableAccordionItem
-              key={item.id}
-              item={item}
-              section={section}
-              renderForm={renderForm}
-            />
-          ))}
-        </Accordion>
-      </SortableContext>
-    </DndContext>
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-3  max-w-full">
+            {items.map((item) => (
+              <SortableListItem
+                key={item.id}
+                item={item}
+                onEdit={() => setEditingItemId(item.id)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      <Dialog open={!!editingItemId} onOpenChange={(open) => !open && setEditingItemId(null)}>
+        <DialogContent className="max-w-3xl w-[95vw] h-[90dvh] sm:h-[85vh] flex flex-col p-0 overflow-hidden bg-background border-border/50 shadow-2xl">
+          <DialogHeader className="p-4 border-b shrink-0 bg-muted/10">
+            <DialogTitle className="capitalize font-bold tracking-tight">Edit {section.replace(/([A-Z])/g, ' $1').trim()}</DialogTitle>
+            <DialogDescription className="sr-only">Make changes to your {section} entry.</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            {activeItem && renderForm(activeItem)}
+          </div>
+
+          <div className="p-4 border-t flex justify-between shrink-0 bg-muted/10">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                if (activeItem) deleteSectionItem(section as any, activeItem.id);
+                setEditingItemId(null);
+              }}
+              className="gap-1.5 shadow-sm"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete
+            </Button>
+            <Button
+              size="sm"
+              className="px-6 font-semibold shadow-sm"
+              onClick={() => setEditingItemId(null)}
+            >
+              Done
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

@@ -77,7 +77,7 @@ export function SidebarRail() {
                     }`}
                   onClick={() => setActiveSection(item.id)}
                 >
-                  <item.icon className="h-4.5 w-4.5" />
+                  <item.icon className="!h-5 !w-5" />
                   {activeSection === "" && <p>{item.label}</p>}
                 </Button>
               </TooltipTrigger>
@@ -99,7 +99,7 @@ export function SidebarRail() {
                     }`}
                   onClick={() => setActiveSection(item.id)}
                 >
-                  <Sparkles className="h-4.5 w-4.5 text-primary" />
+                  <Sparkles className="!h-5 !w-5 text-primary" />
                   {activeSection === "" && <p>{item.name || "Custom Section"}</p>}
                 </Button>
               </TooltipTrigger>
@@ -123,7 +123,7 @@ export function SidebarRail() {
                     }`}
                   onClick={() => setActiveSection(item.id)}
                 >
-                  <item.icon className="h-4.5 w-4.5" />
+                  <item.icon className="!h-5 !w-5" />
                   {activeSection === "" && <p>{item.label}</p>}
                 </Button>
               </TooltipTrigger>

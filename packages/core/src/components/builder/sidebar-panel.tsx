@@ -158,9 +158,9 @@ export function SidebarPanel() {
         onMouseDown={startResizing}
       />
 
-      <div className="p-4 border-b border-border/40 bg-muted/20 backdrop-blur-md flex items-center justify-between min-h-[57px]">
-        <div className="flex flex-col min-w-0">
-          <h2 className="text-xs font-bold tracking-wider uppercase text-foreground/75 truncate pr-2">
+      <div className="px-3 py-2.5 border-b border-border/40 bg-muted/20 backdrop-blur-md flex items-center gap-2 min-h-[57px] overflow-hidden">
+        <div className="flex flex-col min-w-0 flex-1">
+          <h2 className="text-xs font-bold tracking-wider uppercase text-foreground/75 truncate">
             {(() => {
               if (activeSection.startsWith("custom_")) {
                 const custom = (data.sections as any).customSections?.find((c: any) => c.id === activeSection)
@@ -176,13 +176,13 @@ export function SidebarPanel() {
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsWizardMode(!isWizardMode)}
             className={cn(
-              "h-7 text-[10px] font-bold px-2 rounded-md transition-all gap-1",
+              "h-7 text-[10px] font-bold px-2 hidden lg:flex rounded-md transition-all gap-1 items-center",
               isWizardMode ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
             )}
           >
@@ -194,17 +194,17 @@ export function SidebarPanel() {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1.5 text-xs rounded-md border-border/80 px-3 hover:bg-muted/50 transition-colors shadow-xs"
+              className="h-8 gap-1 text-xs rounded-md border-border/80 px-2.5 hover:bg-muted/50 transition-colors shadow-xs"
               onClick={() => addSectionItem(activeSection as any, defaultItems[activeSection])}
             >
               <Plus className="w-3.5 h-3.5" />
-              Add
+              <span className="hidden sm:inline">Add</span>
             </Button>
           )}
         </div>
       </div>
 
-      <ScrollArea className="flex-1  w-full overflow-x-hidden">
+      <ScrollArea className="flex-1 max-w-full w-full overflow-x-hidden">
         <div className={cn("p-4 space-y-6 w-full min-w-0", isWizardMode ? "pb-24" : "pb-20")}>
           {SectionComponent ? <SectionComponent /> : null}
         </div>
