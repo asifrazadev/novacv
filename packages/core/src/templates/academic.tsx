@@ -5,6 +5,7 @@
 import React from "react"
 import { ResumeData } from "@/types/resume"
 import { sanitizeHtml } from "@/lib/sanitize"
+import { isEmptyHtml } from "@/lib/utils"
 import { getTranslation } from "@/lib/i18n"
 
 export interface PageContent {
@@ -99,7 +100,7 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
 
   // ── Summary section ───────────────────────────────────────────────────────
   const renderSummary = () => {
-    if (!sections.summary?.content) return null
+    if (isEmptyHtml(sections.summary?.content)) return null
     return (
       <section key="summary" data-section-id="summary" className="section-block mb-3">
         <SectionHeading>{t("profile")}</SectionHeading>

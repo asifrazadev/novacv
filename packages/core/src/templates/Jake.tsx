@@ -2,6 +2,7 @@
 import React from "react"
 import { ResumeData } from "@/types/resume"
 import { sanitizeHtml } from "@/lib/sanitize"
+import { isEmptyHtml } from "@/lib/utils"
 import { getTranslation } from "@/lib/i18n"
 import { LinkedTitle } from "@/components/shared/ui/linked-title"
 
@@ -86,7 +87,7 @@ export const JakeTemplate = React.memo(function JakeTemplate({ data, content }: 
         switch (id) {
             // ── Summary ────────────────────────────────────────────────────────────
             case "summary":
-                return sections.summary?.content ? (
+                return !isEmptyHtml(sections.summary?.content) ? (
                     <section key={id} data-section-id={id} className="section-block">
                         <SectionHeading>
                             {t("profile")} {isContinued && <ContinuedBadge />}
