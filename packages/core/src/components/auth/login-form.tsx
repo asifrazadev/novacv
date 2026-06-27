@@ -37,7 +37,7 @@ export function LoginForm({ message, step: initialStep }: LoginFormProps) {
           invalid_credentials: "Invalid email or password.",
           unverified_email: "Please verify your email. We just sent you a new link.",
         }
-        setError(msgs[result.error] ?? "Sign in failed.")
+        setError((result.error ? msgs[result.error] : undefined) ?? "Sign in failed.")
       } else if (result.totpRequired) {
         setStep("totp")
       }
