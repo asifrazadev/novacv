@@ -72,7 +72,7 @@ export function BuilderProvider({
   const [mobileView, setMobileView] = React.useState<"editor" | "preview" | "ai">("editor")
   const [showAiPanel, setShowAiPanel] = React.useState(true)
   const [tourOpen, setTourOpen] = React.useState(false)
-  const [activeAiTab, setActiveAiTab] = React.useState<"ats" | "rewrite" | "suggest">("ats")
+  const [activeAiTab, setActiveAiTab] = React.useState<"ats" | "rewrite" | "suggest" | "coverletter" | "scan">("ats")
 
   // Set initial zoom and default active section on mobile — runs once on mount only.
   // Deliberately not re-running on resize so user zoom adjustments are preserved.
