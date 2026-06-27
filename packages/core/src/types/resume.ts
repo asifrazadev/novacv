@@ -141,6 +141,13 @@ export interface Reference {
   description: string
 }
 
+export interface PaginationCacheEntry {
+  main: Array<{ id: string; itemIds?: string[]; bulletIds?: string[] }>
+  sidebar: Array<{ id: string; itemIds?: string[]; bulletIds?: string[] }>
+  showHeader: boolean
+  showFooter: boolean
+}
+
 export interface ResumeData {
   id: string
   title: string
@@ -190,7 +197,7 @@ export interface ResumeData {
     css: string
     /** "category" = name + keywords grouped, "simple" = flat tag list */
     skillsMode?: "category" | "simple"
-    paginationCache?: any[]
+    paginationCache?: PaginationCacheEntry[]
   }
 }
 

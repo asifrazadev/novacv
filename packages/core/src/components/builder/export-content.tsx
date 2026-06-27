@@ -42,8 +42,9 @@ export function ExportContent({ data }: ExportContentProps) {
 
     if (!measureRef.current) return
 
-    const container = measureRef.current
-    const availableHeight = availableHeightPx
+    try {
+      const container = measureRef.current
+      const availableHeight = availableHeightPx
 
     // 1. Get layout information
     const templateDef = getTemplate(data.metadata?.template || "modern")
@@ -227,9 +228,14 @@ export function ExportContent({ data }: ExportContentProps) {
       })
     }
 
-    const finalPages = pagesList.filter(p => p.main.length > 0 || p.sidebar.length > 0)
-    setPages(finalPages.length > 0 ? finalPages : pagesList)
-    setIsLayoutCalculated(true)
+      const finalPages = pagesList.filter(p => p.main.length > 0 || p.sidebar.length > 0)
+      setPages(finalPages.length > 0 ? finalPages : pagesList)
+      setIsLayoutCalculated(true)
+    } catch (err) {
+      console.error("Layout calculation failed:", err)
+      // Signal to Playwright that an error occurred to prevent 30s timeout
+      ;(window as any).__EXPORT_ERROR__ = true
+    }
   }, [data])
 
   useEffect(() => {
@@ -243,8 +249,8 @@ export function ExportContent({ data }: ExportContentProps) {
       {/* Hidden measurement container */}
       <div
         ref={measureRef}
-        className="absolute -left-[10000px] top-0 pointer-events-none bg-white overflow-hidden"
-        style={{ width: `${widthMm}mm`, padding: `${paddingMm}mm` }}
+        className="absolute -left-[10000px] top-0 pointer-events-none bg-white overflow-hidden no-print"
+        style={{ width: `${widthPx}px`, padding: `${paddingPx}px` }}
       >
         {SelectedTemplate && <SelectedTemplate data={data} />}
       </div>
@@ -255,9 +261,9 @@ export function ExportContent({ data }: ExportContentProps) {
           key={index}
           className="resume-page bg-white relative overflow-hidden"
           style={{
-            width: `${widthMm}mm`,
-            height: `${heightMm}mm`,
-            padding: `${paddingMm}mm`,
+            width: `${widthPx}px`,
+            height: `${heightPx}px`,
+            padding: `${paddingPx}px`,
           }}
         >
           {SelectedTemplate && <SelectedTemplate data={data} content={content} />}

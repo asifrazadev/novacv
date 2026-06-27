@@ -2,12 +2,13 @@ import React from "react"
 import { ResumeData } from "@/types/resume"
 import { cn, isEmptyHtml } from "@/lib/utils"
 import { sanitizeHtml } from "@/lib/sanitize"
+import { processHtmlBullets } from "@/lib/html-utils"
 import { getTranslation } from "@/lib/i18n"
 import { LinkedTitle } from "@/components/shared/ui/linked-title"
 
 export interface PageContent {
-    main: { id: string; itemIds?: string[] }[]
-    sidebar: { id: string; itemIds?: string[] }[]
+    main: { id: string; itemIds?: string[]; bulletIds?: string[] }[]
+    sidebar: { id: string; itemIds?: string[]; bulletIds?: string[] }[]
     showHeader: boolean
     showFooter: boolean
     isContinued?: boolean
@@ -104,7 +105,8 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
         },
     }
 
-    const renderSection = (sectionRef: { id: string; itemIds?: string[] }) => {
+    const renderSection = (sectionRef: { id: string; itemIds?: string[]; bulletIds?: string[] }) => {
+    const bulletIds = sectionRef.bulletIds;
         const id = sectionRef.id
         const itemIds = sectionRef.itemIds
         let isContinued = false
@@ -165,8 +167,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                                     {role.description && !isEmptyHtml(role.description) && (
                                                         <div
                                                             className="rich-text pl-5 opacity-90 leading-relaxed executive-bullets"
-                                                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(role.description) }}
-                                                        />
+                                                            >
+                      {processHtmlBullets(sanitizeHtml(role.description), role.id, bulletIds)}
+                    </div>
                                                     )}
                                                 </div>
                                             ))}
@@ -176,8 +179,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     {(!exp.roles || exp.roles.length === 0) && !isEmptyHtml(exp.description) && (
                                         <div
                                             className="rich-text text-[0.8em] opacity-90 leading-relaxed executive-bullets"
-                                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }}
-                                        />
+                                            >
+                      {processHtmlBullets(sanitizeHtml(exp.description), exp.id, bulletIds)}
+                    </div>
                                     )}
                                 </div>
                             ))}
@@ -207,8 +211,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     {!isEmptyHtml(proj.description) && (
                                         <div
                                             className="rich-text pl-5 text-[0.8em] opacity-90 leading-relaxed executive-bullets"
-                                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description) }}
-                                        />
+                                            >
+                      {processHtmlBullets(sanitizeHtml(proj.description), proj.id, bulletIds)}
+                    </div>
                                     )}
                                 </div>
                             ))}
@@ -238,8 +243,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     {!isEmptyHtml(vol.description) && (
                                         <div
                                             className="rich-text pl-5 text-[0.8em] opacity-90 leading-relaxed executive-bullets"
-                                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(vol.description) }}
-                                        />
+                                            >
+                      {processHtmlBullets(sanitizeHtml(vol.description), vol.id, bulletIds)}
+                    </div>
                                     )}
                                 </div>
                             ))}
@@ -401,8 +407,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                     {!isEmptyHtml(c.description) && (
                                         <div
                                             className="rich-text text-[0.8em] opacity-90 leading-relaxed executive-bullets"
-                                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(c.description) }}
-                                        />
+                                            >
+                      {processHtmlBullets(sanitizeHtml(c.description), c.id, bulletIds)}
+                    </div>
                                     )}
                                 </div>
                             ))}
@@ -463,8 +470,9 @@ export const ExecutiveTemplate = React.memo(function ExecutiveTemplate({ data, c
                                         {item.description && !isEmptyHtml(item.description) && (
                                             <div
                                                 className="rich-text text-[0.8em] opacity-90 leading-relaxed executive-bullets"
-                                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.description) }}
-                                            />
+                                                >
+                      {processHtmlBullets(sanitizeHtml(item.description), item.id, bulletIds)}
+                    </div>
                                         )}
                                     </div>
                                 ))}

@@ -1,31 +1,19 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
-
-function setCorsHeaders(response: NextResponse, origin: string | null) {
-  if (origin) {
-    response.headers.set("Access-Control-Allow-Origin", origin)
-    response.headers.set("Access-Control-Allow-Credentials", "true")
-  } else {
-    response.headers.set("Access-Control-Allow-Origin", "*")
-  }
-  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  return response
-}
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { jobApplications } from "@/lib/db/schema"
+import { setCorsHeaders, corsOptions } from "@/lib/cors"
 
 export async function OPTIONS(request: Request) {
-  const origin = request.headers.get("origin")
-  return setCorsHeaders(new NextResponse(null, { status: 204 }), origin)
+  return corsOptions(request, "POST, OPTIONS")
 }
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin")
 
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return setCorsHeaders(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), origin)
     }
 
@@ -35,26 +23,19 @@ export async function POST(request: Request) {
       return setCorsHeaders(NextResponse.json({ error: "Company and position are required" }, { status: 400 }), origin)
     }
 
-    const { data, error } = await supabase
-      .from("job_applications")
-      .insert({
-        user_id: user.id,
-        company: payload.company,
-        position: payload.position,
-        status: payload.status || "wishlist",
-        url: payload.url || "",
-        salary: payload.salary || "",
-        location: payload.location || "",
-        notes: payload.notes || "",
-        applied_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.warn("Supabase insert error from extension:", error)
-      return setCorsHeaders(NextResponse.json({ error: "database_error", message: error.message }, { status: 500 }), origin)
-    }
+    const [data] = await db.insert(jobApplications).values({
+      userId: session.user.id,
+      company: String(payload.company).slice(0, 200),
+      position: String(payload.position).slice(0, 200),
+      status: ["wishlist", "applied", "oa", "interview", "offer", "rejected"].includes(payload.status)
+        ? payload.status
+        : "wishlist",
+      url: String(payload.url || "").slice(0, 2000),
+      salary: String(payload.salary || "").slice(0, 100),
+      location: String(payload.location || "").slice(0, 200),
+      notes: String(payload.notes || "").slice(0, 5000),
+      appliedAt: new Date(),
+    }).returning()
 
     return setCorsHeaders(NextResponse.json({ success: true, data }), origin)
   } catch (err: any) {

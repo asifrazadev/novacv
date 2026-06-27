@@ -245,7 +245,7 @@ export function DashboardClient({ initialResumes }: { initialResumes: any[] }) {
                         {resume.title}
                       </h3>
                       <p className="text-[10px] font-mono text-muted-foreground">
-                        Edited {formatDistanceToNow(new Date(resume.updated_at))} ago
+                        Edited {formatDistanceToNow(new Date(resume.updatedAt))} ago
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5">

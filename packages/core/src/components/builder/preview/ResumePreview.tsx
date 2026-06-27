@@ -25,7 +25,6 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
   const SelectedTemplate = templateDef.component
   const measureRef = useRef<HTMLDivElement>(null)
   const [pages, setPages] = useState<PageContent[]>([])
-  const [renderCount, setRenderCount] = useState(0)
 
   const {
     widthMm,
@@ -37,26 +36,22 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
     availableHeightPx
   } = usePageDimensions(debouncedData.metadata.page)
 
-  // Trigger a second measurement after initial mount to handle late render issues
   useLayoutEffect(() => {
-    setRenderCount(prev => prev + 1)
-  }, [])
-
-  useLayoutEffect(() => {
+    // Function to calculate exact page splits based on actual DOM measurements
     const calculate = () => {
-      if (!measureRef.current) return
-
       const container = measureRef.current
+      if (!container) return
+
       const availableHeight = availableHeightPx
 
       // 1. Get layout information
-      const currentTemplate = getTemplate(data.metadata?.template || "modern")
+      const currentTemplate = getTemplate(debouncedData.metadata?.template || "modern")
       const defaultLayout = currentTemplate?.defaultLayout || {
         main: ["summary", "experience", "education", "projects", "volunteer", "publications", "references"],
         sidebar: ["skills", "languages", "interests", "awards", "certifications", "profiles"]
       }
 
-      const rawLayout = (data.metadata as any).layout
+      const rawLayout = (debouncedData.metadata as any).layout
       const layout = {
         main: (rawLayout?.main && Array.isArray(rawLayout.main)) ? rawLayout.main : defaultLayout.main,
         sidebar: (rawLayout?.sidebar && Array.isArray(rawLayout.sidebar)) ? rawLayout.sidebar : defaultLayout.sidebar
@@ -72,13 +67,24 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
       // Helper to get element by section ID from measurement container
       const getSectionEl = (id: string) => container.querySelector(`[data-section-id="${id}"]`) as HTMLElement
 
+      // Calculate dynamic gap between sections based on the template's CSS (e.g. space-y-4 vs space-y-8)
+      const allSections = Array.from(container.querySelectorAll('[data-section-id]')) as HTMLElement[]
+      let sectionGap = 32 // Fallback default
+      if (allSections.length > 1) {
+        const s1 = allSections[0].getBoundingClientRect()
+        const s2 = allSections[1].getBoundingClientRect()
+        if (s2.top >= s1.bottom) {
+          sectionGap = s2.top - s1.bottom
+        }
+      }
+
       // Calculate Header Height
       const header = container.querySelector("header")
-      const headerHeight = header ? header.getBoundingClientRect().height + 32 : 0
+      const headerHeight = header ? header.getBoundingClientRect().height + sectionGap : 0
 
       // Calculate Footer Height
       const footer = container.querySelector("footer")
-      const footerHeight = footer ? footer.getBoundingClientRect().height + 32 : 0
+      const footerHeight = footer ? footer.getBoundingClientRect().height + sectionGap : 0
 
       // Check template type (single vs 2-column)
       const isSingleColumn = currentTemplate?.defaultLayout?.sidebar?.length === 0
@@ -93,6 +99,11 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
 
       // Helper function to place sections and split them across page boundaries when necessary
       const placeSection = (sectionId: string, isSidebar: boolean) => {
+        // Filter empty sections first
+        const sectionData = debouncedData.sections[sectionId as keyof typeof debouncedData.sections]
+        const hasContent = Array.isArray(sectionData) ? sectionData.length > 0 : !!sectionData
+        if (!hasContent) return
+
         const el = getSectionEl(sectionId)
         if (!el) return
 
@@ -100,13 +111,34 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
         if (totalHeight <= 0) return
 
         const itemEls = Array.from(el.querySelectorAll('[data-item-id]')) as HTMLElement[]
-        const items = itemEls.map((itemEl) => ({
-          id: itemEl.getAttribute('data-item-id')!,
-          height: itemEl.getBoundingClientRect().height
-        }))
+        const items = itemEls.map((itemEl) => {
+          const bulletEls = Array.from(itemEl.querySelectorAll('[data-bullet-id]')) as HTMLElement[];
+          const bullets = bulletEls.map(b => ({
+            id: b.getAttribute('data-bullet-id')!,
+            height: b.getBoundingClientRect().height
+          }));
+          const sumBulletsHeight = bullets.reduce((sum, b) => sum + b.height, 0);
+          return {
+            id: itemEl.getAttribute('data-item-id')!,
+            height: itemEl.getBoundingClientRect().height,
+            bullets,
+            baseHeight: Math.max(0, itemEl.getBoundingClientRect().height - sumBulletsHeight)
+          };
+        })
 
-        // If the section doesn't have split-supporting item blocks, treat it as an atomic block
-        if (items.length === 0) {
+        // Detect if items are laid out horizontally (e.g. inline spans or flex-wrap pills)
+        // If the second item starts before the first item ends vertically, they are on the same line.
+        let isHorizontal = false;
+        if (itemEls.length > 1) {
+          const rect1 = itemEls[0].getBoundingClientRect();
+          const rect2 = itemEls[1].getBoundingClientRect();
+          if (rect2.top < rect1.bottom) {
+            isHorizontal = true;
+          }
+        }
+
+        // If the section doesn't have split-supporting item blocks, or if it's horizontally laid out, treat it as an atomic block
+        if (items.length === 0 || isHorizontal) {
           let placed = false
           const scanHeights = isSidebar ? sidebarHeights : mainHeights
           const startPageIdx = isSidebar ? lastSidebarPageIdx : lastMainPageIdx
@@ -120,11 +152,11 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
               }
               if (isSidebar) {
                 pagesList[i].sidebar.push({ id: sectionId })
-                sidebarHeights[i] = currentHeight + totalHeight + 32
+                sidebarHeights[i] = currentHeight + totalHeight + sectionGap
                 lastSidebarPageIdx = i
               } else {
                 pagesList[i].main.push({ id: sectionId })
-                mainHeights[i] = currentHeight + totalHeight + 32
+                mainHeights[i] = currentHeight + totalHeight + sectionGap
                 lastMainPageIdx = i
               }
               placed = true
@@ -141,11 +173,11 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
             }
             if (isSidebar) {
               pagesList[nextIdx].sidebar.push({ id: sectionId })
-              sidebarHeights[nextIdx] = totalHeight + 32
+              sidebarHeights[nextIdx] = totalHeight + sectionGap
               lastSidebarPageIdx = nextIdx
             } else {
               pagesList[nextIdx].main.push({ id: sectionId })
-              mainHeights[nextIdx] = totalHeight + 32
+              mainHeights[nextIdx] = totalHeight + sectionGap
               lastMainPageIdx = nextIdx
             }
           }
@@ -154,13 +186,26 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
 
         // If the section has items, split them across pages greedily
         const sumItemHeights = items.reduce((sum, item) => sum + item.height, 0)
-        const baseHeight = Math.max(0, totalHeight - sumItemHeights)
+        
+        // Calculate vertical gap between items (e.g. from space-y-X classes)
+        let gap = 0;
+        if (itemEls.length > 1) {
+          const rect1 = itemEls[0].getBoundingClientRect();
+          const rect2 = itemEls[1].getBoundingClientRect();
+          if (rect2.top >= rect1.bottom) {
+            gap = (rect2.top - rect1.bottom) * 1.1; // Add 10% buffer
+          }
+        }
+
+        const baseHeight = Math.max(0, totalHeight - sumItemHeights - (gap * Math.max(0, items.length - 1)))
 
         let remainingItems = [...items]
         let pageIdx = isSidebar ? lastSidebarPageIdx : lastMainPageIdx
 
         // Find the first page where the heading + at least the first item fits
-        while (true) {
+        let guard = 0
+        while (guard < 100) {
+          guard++
           if (!pagesList[pageIdx]) {
             pagesList[pageIdx] = { main: [], sidebar: [], showHeader: pageIdx === 0, showFooter: true }
             mainHeights[pageIdx] = 0
@@ -169,6 +214,13 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
 
           const currentHeight = isSidebar ? (sidebarHeights[pageIdx] ?? 0) : (mainHeights[pageIdx] ?? 0)
           const isPageEmpty = isSidebar ? (pagesList[pageIdx].sidebar.length === 0) : (pagesList[pageIdx].main.length === 0)
+
+          // Infinite loop guard: if first item alone exceeds available space, force placement
+          const firstItemHeight = remainingItems[0].height
+          if (baseHeight + firstItemHeight >= availableHeight) {
+            pageIdx = isSidebar ? lastSidebarPageIdx : lastMainPageIdx
+            break
+          }
 
           if (isPageEmpty || currentHeight + baseHeight + remainingItems[0].height <= availableHeight) {
             break
@@ -186,33 +238,104 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
 
           let currentPageItems: string[] = []
           let accumulatedHeight = baseHeight
+          let currentPageBulletIds: string[] | undefined = undefined;
 
-          // Must place at least the first item on the starting page
-          currentPageItems.push(remainingItems[0].id)
-          accumulatedHeight += remainingItems[0].height
-          remainingItems.shift()
+          // Helper to calculate nextItem's actual height based on remaining bullets
+          const getActualItemHeight = (item: typeof remainingItems[0]) => {
+             if (item.bullets && item.bullets.length > 0) {
+                return item.baseHeight + item.bullets.reduce((sum, b) => sum + b.height, 0);
+             }
+             return item.height;
+          };
 
-          // Place more items if they fit on the current page
           while (remainingItems.length > 0) {
             const nextItem = remainingItems[0]
             const currentHeight = isSidebar ? (sidebarHeights[pageIdx] ?? 0) : (mainHeights[pageIdx] ?? 0)
-            if (currentHeight + accumulatedHeight + nextItem.height <= availableHeight) {
+            const gapToAdd = currentPageItems.length > 0 ? gap : 0;
+            const actualItemHeight = getActualItemHeight(nextItem);
+            
+            const availableSpace = availableHeight - (currentHeight + accumulatedHeight + gapToAdd);
+
+            if (actualItemHeight <= availableSpace || (currentPageItems.length === 0 && (!nextItem.bullets || nextItem.bullets.length === 0))) {
+              // Fits entirely, OR it's the first item on an empty page and cannot be split
               currentPageItems.push(nextItem.id)
-              accumulatedHeight += nextItem.height
+              accumulatedHeight += gapToAdd + actualItemHeight
+              
+              if (nextItem.bullets && nextItem.bullets.length > 0) {
+                 if (!currentPageBulletIds) currentPageBulletIds = [];
+                 currentPageBulletIds.push(...nextItem.bullets.map(b => b.id));
+              }
+              
               remainingItems.shift()
             } else {
-              break
+              // Does not fit entirely. Try to split by bullets.
+              if (nextItem.bullets && nextItem.bullets.length > 0) {
+                 let fitBullets = 0;
+                 let tempHeight = nextItem.baseHeight;
+                 
+                 for (let i = 0; i < nextItem.bullets.length; i++) {
+                   if (tempHeight + nextItem.bullets[i].height <= availableSpace) {
+                     fitBullets++;
+                     tempHeight += nextItem.bullets[i].height;
+                   } else {
+                     break;
+                   }
+                 }
+                 
+                 if (fitBullets > 0) {
+                   // Fit some bullets
+                   currentPageItems.push(nextItem.id);
+                   accumulatedHeight += gapToAdd + tempHeight;
+                   
+                   if (!currentPageBulletIds) currentPageBulletIds = [];
+                   currentPageBulletIds.push(...nextItem.bullets.slice(0, fitBullets).map(b => b.id));
+                   
+                   remainingItems[0] = {
+                     ...nextItem,
+                     bullets: nextItem.bullets.slice(fitBullets)
+                   };
+                   break; // Move to next page
+                 } else {
+                   // Cannot fit even 1 bullet.
+                   if (currentPageItems.length === 0) {
+                      // Force place at least 1 bullet to avoid infinite loop on empty page
+                      currentPageItems.push(nextItem.id);
+                      accumulatedHeight += gapToAdd + nextItem.baseHeight + nextItem.bullets[0].height;
+                      
+                      if (!currentPageBulletIds) currentPageBulletIds = [];
+                      currentPageBulletIds.push(nextItem.bullets[0].id);
+                      
+                      remainingItems[0] = {
+                        ...nextItem,
+                        bullets: nextItem.bullets.slice(1)
+                      };
+                   }
+                   break; // Move to next page
+                 }
+              } else {
+                 // Cannot be split by bullets
+                 if (currentPageItems.length === 0) {
+                    // Force place
+                    currentPageItems.push(nextItem.id);
+                    accumulatedHeight += gapToAdd + actualItemHeight;
+                    remainingItems.shift();
+                 }
+                 break; // Move to next page
+              }
             }
           }
 
+          // currentPageBulletIds is already complete: bullets were pushed incrementally
+          // during placement above, so no post-processing is needed here.
+
           // Add the placed items as a split section chunk
           if (isSidebar) {
-            pagesList[pageIdx].sidebar.push({ id: sectionId, itemIds: currentPageItems })
-            sidebarHeights[pageIdx] = (sidebarHeights[pageIdx] ?? 0) + accumulatedHeight + 32
+            pagesList[pageIdx].sidebar.push({ id: sectionId, itemIds: currentPageItems, bulletIds: currentPageBulletIds })
+            sidebarHeights[pageIdx] = (sidebarHeights[pageIdx] ?? 0) + accumulatedHeight + sectionGap
             lastSidebarPageIdx = pageIdx
           } else {
-            pagesList[pageIdx].main.push({ id: sectionId, itemIds: currentPageItems })
-            mainHeights[pageIdx] = (mainHeights[pageIdx] ?? 0) + accumulatedHeight + 32
+            pagesList[pageIdx].main.push({ id: sectionId, itemIds: currentPageItems, bulletIds: currentPageBulletIds })
+            mainHeights[pageIdx] = (mainHeights[pageIdx] ?? 0) + accumulatedHeight + sectionGap
             lastMainPageIdx = pageIdx
           }
 
@@ -250,7 +373,7 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
         }]
       }
       setPages(finalPages)
-      
+
       // Cache pagination for fast export, but only if changed to prevent infinite loops
       if (context?.updateMetadata) {
         const currentCache = JSON.stringify(data.metadata.paginationCache || [])
@@ -261,8 +384,12 @@ export function ResumePreview({ data, zoom }: ResumePreviewProps) {
       }
     }
 
-    calculate()
-  }, [debouncedData, renderCount, mobileView])
+    if (measureRef.current) {
+      const ro = new ResizeObserver(() => calculate())
+      ro.observe(measureRef.current)
+      return () => ro.disconnect()
+    }
+  }, [debouncedData, availableHeightPx, mobileView])
 
   const fontFamilyVar = getFontVariable(debouncedData.metadata.typography.fontFamily)
 

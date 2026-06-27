@@ -41,7 +41,7 @@ export function getAIModel(config: {
         apiKey,
         baseURL: config.baseUrl || "https://openrouter.ai/api/v1",
         headers: {
-          "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://novacv.onrender.com",
+          ...(process.env.NEXT_PUBLIC_APP_URL && { "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL }),
           "X-Title": "NovaCV",
         },
       })

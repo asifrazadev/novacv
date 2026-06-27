@@ -1,42 +1,31 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { resumes } from "@/lib/db/schema"
+import { eq, and } from "drizzle-orm"
 import { generateObject } from "ai"
 import { z } from "zod"
 import { getAIConfig } from "@/lib/ai-helper"
 import { getAIModel } from "@/lib/ai-provider"
-
-function setCorsHeaders(response: NextResponse, origin: string | null) {
-  if (origin) {
-    response.headers.set("Access-Control-Allow-Origin", origin)
-    response.headers.set("Access-Control-Allow-Credentials", "true")
-  } else {
-    response.headers.set("Access-Control-Allow-Origin", "*")
-  }
-  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  return response
-}
+import { setCorsHeaders, corsOptions } from "@/lib/cors"
 
 export async function OPTIONS(request: Request) {
-  const origin = request.headers.get("origin")
-  return setCorsHeaders(new NextResponse(null, { status: 204 }), origin)
+  return corsOptions(request, "POST, OPTIONS")
 }
 
 const autofillSchema = z.object({
   mappings: z.array(z.object({
     fieldId: z.string(),
-    value: z.union([z.string(), z.boolean()])
-  }))
+    value: z.union([z.string(), z.boolean()]),
+  })),
 })
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin")
 
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return setCorsHeaders(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), origin)
     }
 
@@ -46,39 +35,20 @@ export async function POST(request: Request) {
       return setCorsHeaders(NextResponse.json({ error: "resumeId and fields array are required" }, { status: 400 }), origin)
     }
 
-    // Get user preferences to determine the AI provider and model
-    const { data: prefs } = await supabase
-      .from("user_preferences")
-      .select("*")
-      .eq("user_id", user.id)
-      .single()
-
-    const aiProvider = prefs?.ai_provider || "openai"
-    const apiKeyColumn = `${aiProvider}_api_key`
-    const apiKey = prefs ? prefs[apiKeyColumn] : process.env.OPENAI_API_KEY
-
-    const config = getAIConfig({
-      provider: aiProvider,
-      model: prefs?.ai_model || "gpt-4o-mini",
-      apiKey: apiKey,
-      baseUrl: prefs?.ai_base_url || "",
-    })
-    
+    const config = getAIConfig({ provider: "openai", model: "", apiKey: "", baseUrl: "" })
     const model = getAIModel(config)
 
-    // Fetch the resume
-    const { data: resume, error } = await supabase
-      .from("resumes")
-      .select("content")
-      .eq("id", resumeId)
-      .eq("user_id", user.id)
-      .single()
+    const [resume] = await db
+      .select({ data: resumes.data })
+      .from(resumes)
+      .where(and(eq(resumes.id, resumeId), eq(resumes.userId, session.user.id)))
+      .limit(1)
 
-    if (error || !resume) {
+    if (!resume) {
       return setCorsHeaders(NextResponse.json({ error: "Resume not found" }, { status: 404 }), origin)
     }
 
-    const resumeContent = JSON.stringify(resume.content)
+    const resumeContent = JSON.stringify(resume.data)
 
     const prompt = `You are an intelligent auto-fill assistant for job applications.
 Given the candidate's resume data in JSON format, and a list of form fields extracted from a job application page, map the correct values from the resume to the corresponding form fields.

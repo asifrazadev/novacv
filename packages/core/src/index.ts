@@ -6,7 +6,6 @@ export * from "./hooks/useAutoSave";
 export * from "./hooks/usePageDimensions";
 export * from "./hooks/usePrintExport";
 export * from "./lib/utils";
-export * from "./store";
 export * from "./types/resume";
 export * from "./types/profile";
 export * from "./actions/ai";

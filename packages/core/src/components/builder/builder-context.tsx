@@ -74,22 +74,15 @@ export function BuilderProvider({
   const [tourOpen, setTourOpen] = React.useState(false)
   const [activeAiTab, setActiveAiTab] = React.useState<"ats" | "rewrite" | "suggest">("ats")
 
-  // Handle initial mobile zoom and active section default with window resize listener
+  // Set initial zoom and default active section on mobile — runs once on mount only.
+  // Deliberately not re-running on resize so user zoom adjustments are preserved.
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const handleResize = () => {
-        if (window.innerWidth < 1024) {
-          setZoom(45)
-          if (activeSection === "") {
-            setActiveSection("basics")
-          }
-        }
-      }
-      handleResize()
-      window.addEventListener("resize", handleResize)
-      return () => window.removeEventListener("resize", handleResize)
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setZoom(45)
+      setActiveSection(prev => prev || "basics")
     }
-  }, [activeSection])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Auto-save logic via custom hook
   useAutoSave(resumeId, data, title, setIsSaving)

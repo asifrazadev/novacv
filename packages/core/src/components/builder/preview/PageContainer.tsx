@@ -19,8 +19,6 @@ interface PageContainerProps {
 
 export function PageContainer({
   index,
-  widthMm,
-  heightMm,
   widthPx,
   heightPx,
   paddingPx,

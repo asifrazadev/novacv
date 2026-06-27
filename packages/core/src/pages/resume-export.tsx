@@ -2,7 +2,6 @@ import { getResumeById } from "@/actions/resumes"
 import { sanitizeHtml } from "@/lib/sanitize"
 import { notFound } from "next/navigation"
 import { ExportContent } from "@/components/builder/export-content"
-import { getFontVariable } from "@/lib/utils"
 import { getPrintData } from "@/lib/pdf/printCache"
 
 export default async function ExportPage({
@@ -29,7 +28,6 @@ export default async function ExportPage({
     data = resume.data
   }
   const { format, width: customWidth, height: customHeight } = data.metadata.page || {}
-  const { template } = data.metadata
 
   const PAGE_SIZES: Record<string, { width: number; height: number }> = {
     a4: { width: 210, height: 297 },
@@ -46,12 +44,11 @@ export default async function ExportPage({
   // Determine the CSS @page size value
   const pageSize = (format !== "custom" && standardSize) ? format.charAt(0).toUpperCase() + format.slice(1) : `${widthMm}mm ${heightMm}mm`
   
-  // Get CSS font-family variable based on user selection
-  const fontFamilyVar = getFontVariable(data.metadata.typography.fontFamily)
-  const fontSlug = String(data.metadata.typography.fontFamily).toLowerCase().replace(/\s+/g, '-')
+  const fontFamily: string = data.metadata.typography.fontFamily || "Inter"
+  const fontSlug = fontFamily.toLowerCase().replace(/\s+/g, '-')
 
   return (
-    <div className={`bg-white min-h-screen`} style={{ fontFamily: fontFamilyVar }}>
+    <div className="bg-white min-h-screen print:min-h-0" style={{ fontFamily }}>
       {/* Preload only the active font to accelerate Chromium fonts.ready */}
       <link rel="preload" href={`/fonts/${fontSlug}-regular.woff2`} as="font" type="font/woff2" crossOrigin="anonymous" />
       <link rel="preload" href={`/fonts/${fontSlug}-bold.woff2`} as="font" type="font/woff2" crossOrigin="anonymous" />
@@ -60,98 +57,18 @@ export default async function ExportPage({
       <style dangerouslySetInnerHTML={{
         __html: `
         @font-face {
-          font-family: 'Inter';
-          src: url('/fonts/inter-regular.woff2') format('woff2');
+          font-family: '${data.metadata.typography.fontFamily}';
+          src: url('/fonts/${fontSlug}-regular.woff2') format('woff2');
           font-weight: 400;
           font-style: normal;
+          font-display: block;
         }
         @font-face {
-          font-family: 'Inter';
-          src: url('/fonts/inter-bold.woff2') format('woff2');
+          font-family: '${data.metadata.typography.fontFamily}';
+          src: url('/fonts/${fontSlug}-bold.woff2') format('woff2');
           font-weight: 700;
           font-style: normal;
-        }
-        @font-face {
-          font-family: 'Roboto';
-          src: url('/fonts/roboto-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Roboto';
-          src: url('/fonts/roboto-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Outfit';
-          src: url('/fonts/outfit-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Outfit';
-          src: url('/fonts/outfit-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Playfair Display';
-          src: url('/fonts/playfair-display-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Playfair Display';
-          src: url('/fonts/playfair-display-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Lora';
-          src: url('/fonts/lora-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Lora';
-          src: url('/fonts/lora-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'EB Garamond';
-          src: url('/fonts/eb-garamond-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'EB Garamond';
-          src: url('/fonts/eb-garamond-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'JetBrains Mono';
-          src: url('/fonts/jetbrains-mono-regular.woff2') format('woff2');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'JetBrains Mono';
-          src: url('/fonts/jetbrains-mono-bold.woff2') format('woff2');
-          font-weight: 700;
-          font-style: normal;
-        }
-
-        :root, body {
-          --font-inter: 'Inter', sans-serif;
-          --font-roboto: 'Roboto', sans-serif;
-          --font-outfit: 'Outfit', sans-serif;
-          --font-playfair: 'Playfair Display', serif;
-          --font-lora: 'Lora', serif;
-          --font-eb-garamond: 'EB Garamond', serif;
-          --font-jetbrains-mono: 'JetBrains Mono', monospace;
+          font-display: block;
         }
 
         @page {
@@ -163,7 +80,7 @@ export default async function ExportPage({
           margin: 0 !important;
           padding: 0 !important;
           -webkit-print-color-adjust: exact;
-          font-family: ${fontFamilyVar}, sans-serif;
+          font-family: '${fontFamily}', sans-serif;
         }
         #resume-export-container {
           width: 100%;
@@ -187,9 +104,11 @@ export default async function ExportPage({
           break-inside: avoid;
           page-break-inside: avoid;
         }
-        /* Hide UI elements */
-        .no-print {
-          display: none !important;
+        /* Hide UI elements during print */
+        @media print {
+          .no-print {
+            display: none !important;
+          }
         }
       `}} />
 

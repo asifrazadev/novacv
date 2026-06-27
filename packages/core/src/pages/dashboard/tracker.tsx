@@ -19,7 +19,6 @@ import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { WelcomeGuide } from "@/components/shared/ui/welcome-guide"
 import { LayoutDashboard, Database, Link as LinkIcon, Download } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 const TRACKER_FEATURES = [
   {
@@ -128,28 +127,6 @@ export default function TrackerPage() {
     loadData()
   }, [loadData])
 
-  // Supabase Realtime Subscription
-  React.useEffect(() => {
-    if (localMode) return // Don't subscribe in local mode
-    
-    const supabase = createClient()
-    const channel = supabase
-      .channel('public:job_applications')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'job_applications' },
-        (payload) => {
-          // Whenever a change happens (e.g. from the Chrome Extension or another tab)
-          // silently refetch the data in the background to keep the board perfectly in sync!
-          loadData(true)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [localMode, loadData])
 
   // Save to local storage when local mode is active and state changes
   React.useEffect(() => {

@@ -23,9 +23,11 @@ import { updateEmail, updateProfileMetadata, resetPassword } from "@/actions/aut
 
 interface ProfileTabsClientProps {
   user: any
+  googleEnabled?: boolean
+  githubEnabled?: boolean
 }
 
-export function ProfileTabsClient({ user }: ProfileTabsClientProps) {
+export function ProfileTabsClient({ user, googleEnabled = true, githubEnabled = true }: ProfileTabsClientProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -106,13 +108,16 @@ export function ProfileTabsClient({ user }: ProfileTabsClientProps) {
           <Sparkles className="w-4 h-4" />
           <span>AI Integration</span>
         </TabsTrigger>
-        <TabsTrigger 
-          value="social" 
-          className="h-10 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground data-[state=active]:text-foreground font-semibold gap-1.5 transition-all text-xs sm:text-sm cursor-pointer"
-        >
-          <ShieldCheck className="w-4 h-4" />
-          <span>Social Logins</span>
-        </TabsTrigger>
+        {/* Social Logins Tab */}
+        {(googleEnabled || githubEnabled) && (
+          <TabsTrigger 
+            value="social" 
+            className="h-10 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground data-[state=active]:text-foreground font-semibold gap-1.5 transition-all text-xs sm:text-sm cursor-pointer"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Social Logins</span>
+          </TabsTrigger>
+        )}
       </TabsList>
 
       {/* Tab 1: Profile Info */}
@@ -398,50 +403,56 @@ export function ProfileTabsClient({ user }: ProfileTabsClientProps) {
       </TabsContent>
 
       {/* Tab 5: Connected Socials */}
-      <TabsContent value="social" className="space-y-6 max-w-2xl outline-none">
-        <Card className="border-border/55 bg-card/40 backdrop-blur-xs">
-          <CardHeader className="py-4 border-b border-border/40">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-primary" />
-              <CardTitle className="text-lg">Connected Socials</CardTitle>
-            </div>
-            <CardDescription>Link social accounts so you can log in with one click.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-6">
-            <div className="flex flex-col gap-3">
-              <Button 
-                variant="outline" 
-                className={`w-full justify-start h-12 ${isGoogleConnected ? 'bg-success/5 border-success/20' : 'border-border/40 hover:bg-muted/30'} cursor-pointer`} 
-                disabled={isGoogleConnected}
-              >
-                <Mail className={`mr-3 h-5 w-5 ${isGoogleConnected ? 'text-success' : 'text-primary'}`} />
-                {isGoogleConnected ? 'Connected with Google' : 'Connect Google Account'}
-                {isGoogleConnected && (
-                  <span className="ml-auto text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full flex items-center gap-1 select-none">
-                    <ShieldCheck className="w-3 h-3" />
-                    Active
-                  </span>
+      {(googleEnabled || githubEnabled) && (
+        <TabsContent value="social" className="space-y-6 max-w-2xl outline-none">
+          <Card className="border-border/55 bg-card/40 backdrop-blur-xs">
+            <CardHeader className="py-4 border-b border-border/40">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                <CardTitle className="text-lg">Connected Socials</CardTitle>
+              </div>
+              <CardDescription>Link social accounts so you can log in with one click.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div className="flex flex-col gap-3">
+                {googleEnabled && (
+                  <Button 
+                    variant="outline" 
+                    className={`w-full justify-start h-12 ${isGoogleConnected ? 'bg-success/5 border-success/20' : 'border-border/40 hover:bg-muted/30'} cursor-pointer`} 
+                    disabled={isGoogleConnected}
+                  >
+                    <Mail className={`mr-3 h-5 w-5 ${isGoogleConnected ? 'text-success' : 'text-primary'}`} />
+                    {isGoogleConnected ? 'Connected with Google' : 'Connect Google Account'}
+                    {isGoogleConnected && (
+                      <span className="ml-auto text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full flex items-center gap-1 select-none">
+                        <ShieldCheck className="w-3 h-3" />
+                        Active
+                      </span>
+                    )}
+                  </Button>
                 )}
-              </Button>
 
-              <Button 
-                variant="outline" 
-                className={`w-full justify-start h-12 ${isGithubConnected ? 'bg-success/5 border-success/20' : 'border-border/40 hover:bg-muted/30'} cursor-pointer`} 
-                disabled={isGithubConnected}
-              >
-                <GitBranch className={`mr-3 h-5 w-5 ${isGithubConnected ? 'text-success' : 'text-foreground'}`} />
-                {isGithubConnected ? 'Connected with GitHub' : 'Connect GitHub Account'}
-                {isGithubConnected && (
-                  <span className="ml-auto text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full flex items-center gap-1 select-none">
-                    <ShieldCheck className="w-3 h-3" />
-                    Active
-                  </span>
+                {githubEnabled && (
+                  <Button 
+                    variant="outline" 
+                    className={`w-full justify-start h-12 ${isGithubConnected ? 'bg-success/5 border-success/20' : 'border-border/40 hover:bg-muted/30'} cursor-pointer`} 
+                    disabled={isGithubConnected}
+                  >
+                    <GitBranch className={`mr-3 h-5 w-5 ${isGithubConnected ? 'text-success' : 'text-foreground'}`} />
+                    {isGithubConnected ? 'Connected with GitHub' : 'Connect GitHub Account'}
+                    {isGithubConnected && (
+                      <span className="ml-auto text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full flex items-center gap-1 select-none">
+                        <ShieldCheck className="w-3 h-3" />
+                        Active
+                      </span>
+                    )}
+                  </Button>
                 )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      )}
     </Tabs>
   )
 }

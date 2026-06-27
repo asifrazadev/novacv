@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 import { TooltipProvider } from "@/components/shared/ui/tooltip";
+import { SessionProvider } from "next-auth/react";
 import { headers } from "next/headers";
 
 export default async function RootLayout({
@@ -47,10 +48,12 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
-            <main className="flex-1 flex flex-col">
-              {children}
-            </main>
-            <Toaster />
+            <SessionProvider>
+              <main className="flex-1 flex flex-col">
+                {children}
+              </main>
+              <Toaster />
+            </SessionProvider>
           </TooltipProvider>
         </ThemeProvider>
         <Analytics />

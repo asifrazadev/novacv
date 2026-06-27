@@ -1,43 +1,28 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
-
-function setCorsHeaders(response: NextResponse, origin: string | null) {
-  if (origin) {
-    response.headers.set("Access-Control-Allow-Origin", origin)
-    response.headers.set("Access-Control-Allow-Credentials", "true")
-  } else {
-    response.headers.set("Access-Control-Allow-Origin", "*")
-  }
-  response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  return response
-}
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { resumes } from "@/lib/db/schema"
+import { eq, desc } from "drizzle-orm"
+import { setCorsHeaders, corsOptions } from "@/lib/cors"
 
 export async function OPTIONS(request: Request) {
-  const origin = request.headers.get("origin")
-  return setCorsHeaders(new NextResponse(null, { status: 204 }), origin)
+  return corsOptions(request, "GET, OPTIONS")
 }
 
 export async function GET(request: Request) {
   const origin = request.headers.get("origin")
 
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return setCorsHeaders(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), origin)
     }
 
-    const { data, error } = await supabase
-      .from("resumes")
-      .select("id, title, updated_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
-
-    if (error) {
-      return setCorsHeaders(NextResponse.json({ error: "database_error", message: error.message }, { status: 500 }), origin)
-    }
+    const data = await db
+      .select({ id: resumes.id, title: resumes.title, updatedAt: resumes.updatedAt })
+      .from(resumes)
+      .where(eq(resumes.userId, session.user.id))
+      .orderBy(desc(resumes.updatedAt))
 
     return setCorsHeaders(NextResponse.json({ success: true, resumes: data }), origin)
   } catch (err: any) {

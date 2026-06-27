@@ -1,201 +1,219 @@
-'use server'
+"use server"
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { type Provider } from '@supabase/supabase-js'
-
-function getErrorMessage(error: any): string {
-  if (!error) return 'An unexpected error occurred'
-
-  let msg = error.message
-  if (typeof msg !== 'string' || msg === '{}' || msg.trim() === '') {
-    msg = error.error_description || error.error || 'An unexpected error occurred'
-  }
-
-  if (typeof msg !== 'string' || msg === '{}' || msg.trim() === '') {
-    try {
-      msg = JSON.stringify(error)
-    } catch {
-      msg = String(error)
-    }
-  }
-
-  if (msg === '{}' || !msg || msg.trim() === '') {
-    msg = 'An unexpected error occurred'
-  }
-
-  return msg
-}
+import { redirect } from "next/navigation"
+import { revalidatePath } from "next/cache"
+import { signIn, signOut, auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { users, verificationTokens } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
+import bcrypt from "bcryptjs"
+import { AuthError } from "next-auth"
+import crypto from "crypto"
+import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/mail"
 
 export async function login(formData: FormData) {
-  const supabase = await createClient()
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  try {
+    await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirectTo: "/dashboard",
+    })
+  } catch (error) {
+    if (error instanceof AuthError) {
+      redirect(`/login?message=${encodeURIComponent("Invalid email or password")}`)
+    }
+    throw error
   }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
-  if (error) {
-    console.error('Login error:', error)
-    const errorMsg = getErrorMessage(error)
-    redirect(`/login?message=${encodeURIComponent(errorMsg)}`)
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const fullName = formData.get('full_name') as string
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
+  const fullName = formData.get("full_name") as string
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-      }
-    }
-  })
-  if (error) {
-    redirect('/register?message=Could not authenticate user')
+  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
+  if (existing.length > 0) {
+    redirect("/register?message=An account with this email already exists")
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/register?status=success')
+  const passwordHash = await bcrypt.hash(password, 10)
+
+  await db.insert(users).values({
+    email,
+    name: fullName || null,
+    passwordHash,
+  })
+
+  try {
+    const token = await generateVerificationToken(email)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
+  } catch (err) {
+    console.error("Failed to send verification email:", err)
+  }
+
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/dashboard",
+    })
+  } catch (error) {
+    if (error instanceof AuthError) {
+      redirect("/login?message=Account created. Please sign in.")
+    }
+    throw error
+  }
 }
 
-export async function signInWithProvider(formData: FormData) {
-  const provider = formData.get('provider') as unknown as Provider
-  const supabase = await createClient()
+export async function generateVerificationToken(email: string) {
+  const token = crypto.randomUUID()
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback`,
-    },
+  await db.delete(verificationTokens).where(eq(verificationTokens.identifier, email))
+  
+  await db.insert(verificationTokens).values({
+    identifier: email,
+    token,
+    expires,
   })
 
-  if (error) {
-    redirect(`/register?message=OAuth sign in failed`)
-  }
+  return token
+}
 
-  if (data.url) {
-    redirect(data.url)
-  }
+export async function resendVerificationEmail(email: string) {
+  const token = await generateVerificationToken(email)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
+}
+
+export async function verifyEmailToken(token: string) {
+  const [dbToken] = await db
+    .select()
+    .from(verificationTokens)
+    .where(eq(verificationTokens.token, token))
+    .limit(1)
+
+  if (!dbToken) return { error: "Invalid token" }
+  if (new Date() > dbToken.expires) return { error: "Token expired" }
+
+  await db
+    .update(users)
+    .set({ emailVerified: new Date() })
+    .where(eq(users.email, dbToken.identifier))
+
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.token, token))
+
+  return { success: true }
 }
 
 export async function logout() {
-  try {
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-  } catch (err) {
-    console.error('[Auth] Logout error during signOut:', err)
-  }
-
-  redirect('/login')
+  await signOut({ redirectTo: "/login" })
 }
 
 export async function forgotPassword(formData: FormData) {
-  const email = formData.get('email') as string
-  const supabase = await createClient()
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-  })
+  const email = formData.get("email") as string
 
-  if (error) {
-    const errorMsg = getErrorMessage(error)
-    redirect(`/forgot-password?message=${encodeURIComponent(errorMsg)}`)
+  const result = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
+
+  // Always redirect with the same message to avoid user enumeration
+  if (result.length > 0) {
+    const token = crypto.randomBytes(32).toString("hex")
+    const expires = new Date(Date.now() + 1000 * 60 * 60) // 1 hour
+
+    await db.insert(verificationTokens).values({
+      identifier: email,
+      token,
+      expires,
+    }).onConflictDoUpdate({
+      target: [verificationTokens.identifier, verificationTokens.token],
+      set: { expires },
+    })
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const resetLink = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`
+
+    try {
+      await sendPasswordResetEmail(email, resetLink)
+    } catch (err) {
+      console.error("[password-reset] Failed to send email:", err)
+      // Still log the link so dev can test without SMTP configured
+      console.info(`[password-reset] ${resetLink}`)
+    }
   }
 
-  redirect('/forgot-password?message=Password reset link sent to your email')
+  redirect("/forgot-password?message=If that email exists, a reset link has been sent")
 }
 
 export async function resetPassword(formData: FormData) {
-  const password = formData.get('password') as string
-  const confirmPassword = formData.get('confirm_password') as string
-  const oldPassword = formData.get('old_password') as string
-  const redirectTo = (formData.get('redirectTo') as string) || '/dashboard/security'
+  const password = formData.get("password") as string
+  const confirmPassword = formData.get("confirm_password") as string
+  const token = formData.get("token") as string
+  const email = formData.get("email") as string
 
   if (password !== confirmPassword) {
-    redirect(`${redirectTo}?message=Passwords do not match`)
+    redirect(`/reset-password?token=${token}&email=${encodeURIComponent(email)}&message=Passwords do not match`)
   }
 
-  const supabase = await createClient()
+  const result = await db
+    .select()
+    .from(verificationTokens)
+    .where(eq(verificationTokens.identifier, email))
+    .limit(1)
 
-  // If old password is provided, verify it first
-  if (oldPassword) {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user?.email) {
-      const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: oldPassword,
-      })
-      if (verifyError) {
-        redirect(`${redirectTo}?message=Current password is incorrect`)
-      }
-    }
+  const record = result.find((r) => r.token === token)
+
+  if (!record || record.expires < new Date()) {
+    redirect("/forgot-password?message=Reset link is invalid or expired. Please request a new one.")
   }
 
-  const { error } = await supabase.auth.updateUser({
-    password: password,
-  })
+  const passwordHash = await bcrypt.hash(password, 10)
 
-  if (error) {
-    const errorMsg = getErrorMessage(error)
-    redirect(`${redirectTo}?message=${encodeURIComponent(errorMsg)}`)
-  }
+  await db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.email, email))
+  await db.delete(verificationTokens).where(eq(verificationTokens.identifier, email))
 
-  redirect(`${redirectTo}?message=Password updated successfully`)
+  redirect("/login?message=Password updated successfully. Please sign in.")
 }
 
 export async function updateEmail(formData: FormData) {
-  const email = formData.get('email') as string
-  const supabase = await createClient()
+  const session = await auth()
+  if (!session?.user?.id) redirect("/login")
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const email = formData.get("email") as string
 
-  const { error } = await supabase.auth.updateUser({
-    email: email,
-  }, {
-    emailRedirectTo: `${siteUrl}/auth/callback?next=/dashboard/profile&message=Email updated successfully`,
-  })
-
-  if (error) {
-    const errorMsg = getErrorMessage(error)
-    redirect(`/dashboard/profile?message=${encodeURIComponent(errorMsg)}`)
+  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
+  if (existing.length > 0) {
+    redirect("/dashboard/profile?message=That email is already in use")
   }
 
-  redirect('/dashboard/profile?message=Confirmation link sent to both old and new email addresses')
+  await db.update(users).set({ email, updatedAt: new Date() }).where(eq(users.id, session.user.id))
+
+  revalidatePath("/dashboard/profile")
+  redirect("/dashboard/profile?message=Email updated successfully")
+}
+
+export async function signInWithProvider(formData: FormData) {
+  const provider = formData.get("provider") as string
+  await signIn(provider, { redirectTo: "/dashboard" })
 }
 
 export async function updateProfileMetadata(formData: FormData) {
-  const fullName = formData.get('full_name') as string
-  const title = formData.get('title') as string
-  const bio = formData.get('bio') as string
+  const session = await auth()
+  if (!session?.user?.id) redirect("/login")
 
-  const supabase = await createClient()
+  const name = formData.get("full_name") as string
+  const professionalTitle = formData.get("title") as string
+  const bio = formData.get("bio") as string
 
-  const { error } = await supabase.auth.updateUser({
-    data: {
-      full_name: fullName,
-      professional_title: title,
-      bio: bio
-    }
-  })
+  await db.update(users).set({
+    name: name || null,
+    professionalTitle: professionalTitle || null,
+    bio: bio || null,
+    updatedAt: new Date(),
+  }).where(eq(users.id, session.user.id))
 
-  if (error) {
-    const errorMsg = getErrorMessage(error)
-    redirect(`/dashboard/profile?message=${encodeURIComponent(errorMsg)}`)
-  }
-
-  revalidatePath('/dashboard/profile')
-  redirect('/dashboard/profile?message=Profile updated successfully')
+  revalidatePath("/dashboard/profile")
+  redirect("/dashboard/profile?message=Profile updated successfully")
 }

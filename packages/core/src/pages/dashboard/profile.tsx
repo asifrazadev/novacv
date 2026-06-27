@@ -1,12 +1,30 @@
 import { Suspense } from "react"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { users } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
 import { ProfileTabsClient } from "@/components/dashboard/profile-tabs"
 import { FormMessageToast } from "@/components/shared/forms/form-message-toast"
 
 export default async function ProfilePage(props: { searchParams: Promise<{ message: string }> }) {
   const searchParams = await props.searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await auth()
+
+  let userProfile = null
+  if (session?.user?.id) {
+    const [row] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1)
+    if (row) {
+      userProfile = {
+        email: row.email,
+        emailVerified: row.emailVerified,
+        user_metadata: {
+          full_name: row.name,
+          professional_title: row.professionalTitle,
+          bio: row.bio,
+        },
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full pb-12">
@@ -16,7 +34,11 @@ export default async function ProfilePage(props: { searchParams: Promise<{ messa
       </div>
 
       <Suspense fallback={<div className="h-40 w-full animate-pulse bg-muted/20 rounded-xl" />}>
-        <ProfileTabsClient user={user} />
+        <ProfileTabsClient 
+          user={userProfile} 
+          googleEnabled={!!process.env.GOOGLE_CLIENT_ID}
+          githubEnabled={!!process.env.GITHUB_CLIENT_ID}
+        />
       </Suspense>
 
       {searchParams?.message && (

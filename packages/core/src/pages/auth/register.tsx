@@ -16,10 +16,15 @@ export default async function RegisterPage(props: { searchParams: Promise<{ mess
       alternateLinkLabel="Sign in"
     >
       {/* Social Logins */}
-      <SocialLogin />
-
-      {/* Divider */}
-      <AuthDivider />
+      {(process.env.GOOGLE_CLIENT_ID || process.env.GITHUB_CLIENT_ID) && (
+        <>
+          <SocialLogin 
+            googleEnabled={!!process.env.GOOGLE_CLIENT_ID}
+            githubEnabled={!!process.env.GITHUB_CLIENT_ID}
+          />
+          <AuthDivider />
+        </>
+      )}
 
       {/* Sign Up Form */}
       <RegisterForm message={searchParams?.message} status={searchParams?.status} />

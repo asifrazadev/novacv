@@ -1,44 +1,35 @@
-// src/lib/pdf/generatePdf.ts
 import { getPage, releasePage } from "./pagePool"
 
 interface PdfJobData {
   url: string
-  cookies: any[]
   pdfOptions: Record<string, unknown>
 }
 
 export async function generatePdf(data: PdfJobData): Promise<Buffer> {
-  const t0 = Date.now()
   const page = await getPage()
 
   try {
-    const { url, cookies, pdfOptions } = data
+    const { url, pdfOptions } = data
 
-    if (cookies && cookies.length > 0) {
-      // Clear cookies from previous page runs to avoid session leakage
-      try {
-        const currentCookies = await page.context().cookies()
-        if (currentCookies.length > 0) {
-          await page.context().clearCookies()
-        }
-      } catch (e) {
-        console.warn('[Playwright Pool] error clearing page cookies:', e)
-      }
-      await page.context().addCookies(cookies)
-    }
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+    page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
       timeout: 15000,
     })
 
-    // Wait for the signal set by React after layout is ready
     await page.waitForFunction(
-      () => document.body.getAttribute("data-wf-loaded") === "true",
-      { timeout: 8000 }
+      () => document.body.getAttribute("data-wf-loaded") === "true" || (window as any).__EXPORT_ERROR__ === true,
+      undefined,
+      { timeout: 30000 }
     )
 
-    // Ensure fonts are fully rendered before printing
+    const isError = await page.evaluate(() => (window as any).__EXPORT_ERROR__ === true)
+    if (isError) {
+      throw new Error("Client-side export error occurred during layout calculation.")
+    }
+
     await page.evaluate(() => document.fonts.ready)
 
     const pdfBuffer = await page.pdf({

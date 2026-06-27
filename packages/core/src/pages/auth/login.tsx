@@ -16,10 +16,15 @@ export default async function LoginPage(props: { searchParams: Promise<{ message
       alternateLinkLabel="Sign up free"
     >
       {/* Social Logins */}
-      <SocialLogin />
-
-      {/* Divider */}
-      <AuthDivider />
+      {(process.env.GOOGLE_CLIENT_ID || process.env.GITHUB_CLIENT_ID) && (
+        <>
+          <SocialLogin 
+            googleEnabled={!!process.env.GOOGLE_CLIENT_ID}
+            githubEnabled={!!process.env.GITHUB_CLIENT_ID}
+          />
+          <AuthDivider />
+        </>
+      )}
 
       {/* Email + Password Form */}
       <LoginForm message={searchParams?.message} />

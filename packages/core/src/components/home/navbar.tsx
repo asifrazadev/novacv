@@ -1,48 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { Sparkles, LayoutDashboard } from "lucide-react"
+import { LayoutDashboard } from "lucide-react"
 import { ThemeToggle } from "@/components/shared/theme/theme-toggle"
-import LogoIcon from "@/components/shared/logo-icon"
 import { Button } from "@/components/shared/ui/button"
-import { Badge } from "@/components/shared/ui/badge"
 import { Github } from "@/components/home/github"
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import type { User } from "@supabase/supabase-js"
+import { useSession } from "next-auth/react"
 import TextLogo from "../shared/logotext"
 
 const GITHUB_URL = "https://github.com/asifrazadev/novacv"
+const AUTH_ENABLED = process.env.NEXT_PUBLIC_AUTH_ENABLED !== "false"
 
 export function Navbar() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const supabase = createClient()
-
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
-    }
-
-    fetchUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null)
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [])
+  const { data: session, status } = useSession()
+  const loading = status === "loading"
+  const user = session?.user
 
   return (
     <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container mx-auto px-3 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2 group">
-          <Link href={user ? "/dashboard" : "/"}>
+          <Link href={user || !AUTH_ENABLED ? "/dashboard" : "/"}>
             <TextLogo className="w-32 md:w-40 hover:opacity-90 transition-opacity" />
           </Link>
         </div>
@@ -71,7 +49,14 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          {!loading && (
+          {!AUTH_ENABLED ? (
+            <Button asChild size="sm" className="rounded-md h-8 text-xs px-2 md:px-4 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold ml-1">
+              <Link href="/dashboard">
+                <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
+                Dashboard
+              </Link>
+            </Button>
+          ) : !loading && (
             user ? (
               <Button asChild size="sm" className="rounded-md h-8 text-xs px-2 md:px-4 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold ml-1">
                 <Link href="/dashboard">

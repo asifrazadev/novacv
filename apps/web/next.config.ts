@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["@novacv/core"],
-  allowedDevOrigins: ['192.168.0.102'],
-  serverExternalPackages: ["@sparticuz/chromium", "playwright-core"],
+
+  serverExternalPackages: ["@sparticuz/chromium", "playwright-core", "pg", "bcryptjs"],
   outputFileTracingIncludes: {
     '/api/**/*': [
       './node_modules/playwright-core/browsers.json',

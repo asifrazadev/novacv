@@ -6,8 +6,6 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 
 **Your data, your infrastructure.** NovaCV is a 100% open-source resume builder and application tracker. Unlike closed, paywalled competitors, you can self-host NovaCV to keep your professional data fully under your control. Use local AI models via Ollama to ensure your data never touches a third-party server.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fasifrazadev%2FNovaCV)
-
 ## ✨ Features
 
 ### 🚀 Core Features - Currently Implemented
@@ -55,7 +53,7 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 - **High-Fidelity PDF Export**: Dual-engine generation (server-side Playwright rendering or client-side react-pdf renderer) for pixel-perfect printouts.
 - **Word Document (.docx) Export**: Download resume as a native Microsoft Word document using structural tables and paragraph formatting.
 - **Public Sharing**: Generate unique, secure links to share a web-viewable, read-only copy of your resume.
-- **Authentication & RLS**: Fully protected Supabase login with Row-Level Security policies ensuring private database isolation.
+- **Authentication**: Auth.js (NextAuth v5) with email/password and OAuth provider support.
 
 ### 🛠️ Planned Features & Roadmap
 - [ ] **Expanded Template Gallery**: Additional industry-specific templates
@@ -71,10 +69,8 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 - **Monorepo**: [Turborepo](https://turbo.build) - High-performance build system
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com) with PostCSS support
 - **State Management**: [Zustand](https://github.com/pmndrs/zustand) - Lightweight client state management
-- **Database & Authentication**: [Supabase](https://supabase.com) - Open-source Firebase alternative
-  - PostgreSQL database with Row-Level Security (RLS)
-  - Email, Google, and GitHub OAuth providers
-  - Automatic profile creation on signup via database triggers
+- **Database**: PostgreSQL with [Drizzle ORM](https://orm.drizzle.team) — type-safe queries, plain SQL migrations, no external service required
+- **Authentication**: [Auth.js v5 (NextAuth)](https://authjs.dev) — credentials + OAuth, JWT sessions, Drizzle adapter
 - **Rich Text Editing**: [Tiptap](https://tiptap.dev) - Headless WYSIWYG editor
 - **UI Components**: [Shadcn UI](https://ui.shadcn.com) - Accessible component library built on Radix UI
 - **Document Generation**: 
@@ -98,141 +94,199 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 ## 🏁 Getting Started
 
 ### Prerequisites
+
 - **Node.js** 20+ (LTS recommended)
-- **npm** 10+ or **pnpm** 8+
-- A **Supabase Project** (free tier available at [supabase.com](https://supabase.com))
-- (Optional) AI Provider API Keys (OpenAI, Anthropic, Google, etc.) for AI features
+- **npm** 10.8+
+- A **PostgreSQL** database (local install, Docker, or any managed Postgres)
+- (Optional) AI provider API keys for AI features
 
-### Installation & Setup
+---
 
-This project is structured as a **Turborepo monorepo**.
+### Option A — Run locally (development)
 
-#### 1. **Clone the Repository**
+#### 1. Clone and install
+
 ```bash
 git clone https://github.com/asifrazadev/NovaCV.git
 cd NovaCV
-```
-
-#### 2. **Install Dependencies**
-```bash
 npm install
 ```
 
-#### 3. **Set Up Supabase Project**
-1. Create a new project at [Supabase Dashboard](https://supabase.com/dashboard)
-2. Go to **SQL Editor** in your Supabase project
-3. Click **New Query** and paste the contents of:
-   ```
-   supabase/migrations/20260415152653_init_schema.sql
-   ```
-4. Execute the SQL to set up:
-   - `profiles` table with user profile information
-   - `resumes` table for storing resume data
-   - Row-Level Security (RLS) policies for data protection
-   - Automatic profile creation trigger on user signup
+#### 2. Set up a PostgreSQL database
 
-#### 4. **Configure Environment Variables**
-1. Copy the example environment file:
-   ```bash
-   cp .env.example .env.local
-   ```
+Any Postgres 15+ will work. Quickest local option:
 
-2. Fill in your Supabase credentials from your project settings:
-   ```env
-   # Supabase Configuration
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
+```bash
+docker run -d \
+  --name novacv-db \
+  -e POSTGRES_DB=novacv \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+```
 
-   # AI Provider Keys (optional, can be set in UI later)
-   OPENAI_API_KEY=your-key-here
-   ANTHROPIC_API_KEY=your-key-here
-   GEMINI_API_KEY=your-key-here
-   OPENROUTER_API_KEY=your-key-here
-   OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-   OPENROUTER_MODEL=openai/gpt-4o
-   ```
+#### 3. Apply the database migration
 
-3. **Get Your Supabase Credentials**:
-   - Go to **Settings > API** in your Supabase project
-   - Copy `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-   - Copy `anon public key` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+```bash
+psql postgres://postgres:postgres@localhost:5432/novacv -f drizzle/0000_init_schema.sql
+```
 
-#### 5. **Run the Development Server**
+#### 4. Configure environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and set at minimum:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/novacv
+
+# Generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=your-random-secret-here
+NEXTAUTH_URL=http://localhost:3000
+
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Optional — at least one AI key enables AI features
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+GEMINI_API_KEY=
+OPENROUTER_API_KEY=
+```
+
+#### 5. Start the dev server
+
 ```bash
 npm run dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to start building resumes.
+Open [http://localhost:3000](http://localhost:3000) and register an account.
+
+---
+
+### Option B — One-command Docker stack
+
+No database setup needed. Postgres + migrations + Next.js all start together.
+
+#### 1. Configure secrets (optional but recommended)
+
+Create a `.env` file in the project root:
+
+```env
+# Generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=your-random-secret-here
+
+# Optional AI keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=...
+OPENROUTER_API_KEY=sk-or-...
+```
+
+#### 2. Start everything
+
+```bash
+docker compose up --build
+```
+
+Docker Compose will:
+1. Start PostgreSQL 16
+2. Apply the schema migration automatically
+3. Start the Next.js app
+
+| Service | URL |
+|---|---|
+| App | http://localhost:3000 |
+
+Open http://localhost:3000, click **Register**, and create an account.
+
+#### Stop / restart
+
+```bash
+docker compose down          # stop, keep database data
+docker compose down -v       # stop and wipe the database
+docker compose up -d         # run in background (no logs)
+```
+
+---
 
 ### Project Structure
+
+This is a **Turborepo monorepo** with two workspaces:
+
 ```
 NovaCV/
-├── src/
-│   ├── app/                 # Next.js App Router pages
-│   │   ├── (auth)/          # Authentication pages (login, register, etc.)
-│   │   ├── api/             # API routes
-│   │   ├── dashboard/       # Dashboard and user area
-│   │   ├── resumes/         # Resume builder and public viewer
-│   │   └── page.tsx         # Landing page
-│   ├── components/          # Reusable React components
-│   │   ├── builder/         # Resume builder components
-│   │   ├── dashboard/       # Dashboard components
-│   │   ├── auth/            # Authentication components
-│   │   ├── home/            # Landing page components
-│   │   └── ui/              # Shadcn UI component library
-│   ├── lib/                 # Utility functions
-│   │   ├── ai-helper.ts     # AI provider initialization
-│   │   ├── ai-provider.ts   # AI API integrations
-│   │   ├── export-pdf.ts    # PDF generation logic
-│   │   ├── import-parser.ts # PDF parsing for resume import
-│   │   └── utils.ts         # General utilities
-│   ├── store/               # Zustand state management
-│   │   └── use-ai-store.ts  # AI configuration store
-│   ├── templates/           # Resume templates
-│   │   ├── modern.tsx       # Modern two-column template
-│   │   ├── Jake.tsx         # Professional single-column template
-│   │   └── executive.tsx    # Executive skills-first template
-│   ├── types/               # TypeScript type definitions
-│   ├── utils/               # Supabase and utility helpers
-│   └── middleware.ts        # Authentication middleware
-├── supabase/
-│   └── migrations/          # Database schema and migrations
-├── public/                  # Static assets
-├── package.json             # Project dependencies
-└── next.config.ts           # Next.js configuration
+├── apps/
+│   └── web/                        # Next.js application
+│       ├── src/
+│       │   ├── app/                # App Router pages and API routes
+│       │   │   ├── (auth)/         # Login, register, password reset
+│       │   │   ├── api/            # API routes (PDF, extension endpoints)
+│       │   │   ├── dashboard/      # Authenticated user area
+│       │   │   └── p/[id]/         # Public resume viewer
+│       │   ├── middleware.ts        # Auth session middleware
+│       │   └── globals.css
+│       ├── next.config.ts
+│       └── package.json
+│
+├── packages/
+│   └── core/                       # Shared library (used by apps/web)
+│       └── src/
+│           ├── actions/            # Next.js server actions (auth, resumes, applications)
+│           ├── components/         # React components (builder, templates, UI)
+│           ├── lib/                # Utilities (AI, Drizzle db, PDF, export)
+│           ├── templates/          # Resume templates (Modern, Jake, Executive, Academic)
+│           └── types/              # Shared TypeScript types
+│
+├── docker-compose.yml
+├── Dockerfile
+├── .env.example
+└── package.json                    # Turborepo root
 ```
 
 ### Available Scripts
 
+Run all commands from the **repository root**:
+
 ```bash
-# Development
-npm run dev           # Start development server
-
-# Production
-npm run build         # Build for production
-npm start            # Start production server
-
-# Code Quality
-npm run lint         # Run ESLint
+npm run dev        # Start development server (all workspaces via Turborepo)
+npm run build      # Production build
+npm run lint       # Run ESLint across all workspaces
 ```
+
+To run only the web app directly:
+
+```bash
+cd apps/web
+npm run dev        # next dev
+npm run build      # next build
+npm start          # next start (production)
+```
+
+---
 
 ### Deployment
 
-#### Deploy to Vercel (Recommended)
-1. Use the [Deploy with Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fasifrazadev%2FNovaCV) button.
-2. Set your Supabase environment variables during the deployment step.
-3. Deploy!
+#### Deploy to Vercel (recommended)
 
-For full self-hosting documentation (including Docker Compose), see our [Self-Hosting Guide](docs/self-hosting.md).
+1. Click the Deploy button below.
+2. Set your environment variables (`DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and any AI keys) in the Vercel project settings.
+3. Deploy.
 
-#### Deploy to Other Platforms
-The app is a standard Next.js application and can be deployed to any Node.js hosting service (AWS, Heroku, Railway, etc.). Ensure:
-- Node.js 20+ is available
-- Environment variables are configured
-- Database migrations are applied to your Supabase instance
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fasifrazadev%2FNovaCV)
+
+Vercel auto-detects the monorepo and builds `apps/web` correctly.
+
+#### Deploy to other platforms
+
+The app outputs a Next.js standalone build (`output: "standalone"` in `next.config.ts`). Any platform that runs Node.js 20+ and accepts a Docker image or a Node.js server works — Railway, Render, Fly.io, AWS, etc.
+
+Required at runtime:
+- `DATABASE_URL` — Postgres connection string
+- `NEXTAUTH_SECRET` — random secret (32+ bytes)
+- `NEXTAUTH_URL` — your public app URL
+- At least one AI key if you want AI features enabled server-side
 
 ## 📄 License
 
@@ -273,7 +327,7 @@ Switch between professionally designed templates without losing your data. Each 
 ## ❓ FAQ
 
 **Q: Is NovaCV free?**
-A: Yes! NovaCV is completely free and open-source. You only need a free Supabase account.
+A: Yes! NovaCV is completely free and open-source. You just need a PostgreSQL database to run it.
 
 **Q: Do I need to provide my own AI API keys?**
 A: No, AI features are optional. You can use NovaCV as a standard resume builder without them. To enable AI features, provide your own API keys from OpenAI, Anthropic, Google, etc.
@@ -285,7 +339,7 @@ A: Yes! NovaCV generates pixel-perfect PDFs that match your screen exactly, full
 A: Yes! Generate a public shareable link for your resume. Others can view it in a read-only format.
 
 **Q: What happens to my data?**
-A: Your data is stored securely in your Supabase database. Only you have access (with Row-Level Security policies in place).
+A: Your data lives in your own PostgreSQL database. Only you have access — no third-party cloud service involved.
 
 **Q: Can I use multiple templates?**
 A: Yes! Switch between templates anytime. You can also create multiple resumes for different positions.

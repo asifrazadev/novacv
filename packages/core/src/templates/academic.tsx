@@ -5,12 +5,13 @@
 import React from "react"
 import { ResumeData } from "@/types/resume"
 import { sanitizeHtml } from "@/lib/sanitize"
+import { processHtmlBullets } from "@/lib/html-utils"
 import { isEmptyHtml } from "@/lib/utils"
 import { getTranslation } from "@/lib/i18n"
 
 export interface PageContent {
-  main: { id: string; itemIds?: string[] }[]
-  sidebar: { id: string; itemIds?: string[] }[]
+  main: { id: string; itemIds?: string[]; bulletIds?: string[] }[]
+  sidebar: { id: string; itemIds?: string[]; bulletIds?: string[] }[]
   showHeader: boolean
   showFooter: boolean
   isContinued?: boolean
@@ -113,7 +114,8 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
   }
 
   // ── Section renderer ──────────────────────────────────────────────────────
-  const renderSection = (sectionRef: { id: string; itemIds?: string[] }) => {
+  const renderSection = (sectionRef: { id: string; itemIds?: string[]; bulletIds?: string[] }) => {
+    const bulletIds = sectionRef.bulletIds;
     const { id, itemIds } = sectionRef
 
     switch (id) {
@@ -157,8 +159,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                   {edu.description && (
                     <div
                       className="rich-text mt-1 text-[0.8em] opacity-80 leading-snug pl-4"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }}
-                    />
+                      >
+                      {processHtmlBullets(sanitizeHtml(edu.description), edu.id, bulletIds)}
+                    </div>
                   )}
                 </div>
               ))}
@@ -201,8 +204,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                           {role.description && (
                             <div
                               className="rich-text academic-bullets text-[0.8em] opacity-85 leading-snug"
-                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(role.description) }}
-                            />
+                              >
+                      {processHtmlBullets(sanitizeHtml(role.description), role.id, bulletIds)}
+                    </div>
                           )}
                         </div>
                       ))}
@@ -216,8 +220,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                       {exp.description && (
                         <div
                           className="rich-text academic-bullets text-[0.8em] opacity-85 leading-snug mt-0.5"
-                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }}
-                        />
+                          >
+                      {processHtmlBullets(sanitizeHtml(exp.description), exp.id, bulletIds)}
+                    </div>
                       )}
                     </>
                   )}
@@ -254,8 +259,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                   {proj.description && (
                     <div
                       className="rich-text academic-bullets text-[0.8em] opacity-85 leading-snug mt-0.5"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description) }}
-                    />
+                      >
+                      {processHtmlBullets(sanitizeHtml(proj.description), proj.id, bulletIds)}
+                    </div>
                   )}
                 </div>
               ))}
@@ -361,8 +367,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                   {c.description && (
                     <div
                       className="rich-text academic-bullets text-[0.8em] opacity-85 leading-snug mt-0.5"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(c.description) }}
-                    />
+                      >
+                      {processHtmlBullets(sanitizeHtml(c.description), c.id, bulletIds)}
+                    </div>
                   )}
                 </div>
               ))}
@@ -398,8 +405,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                   {vol.description && (
                     <div
                       className="rich-text academic-bullets text-[0.8em] opacity-85 leading-snug mt-0.5"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(vol.description) }}
-                    />
+                      >
+                      {processHtmlBullets(sanitizeHtml(vol.description), vol.id, bulletIds)}
+                    </div>
                   )}
                 </div>
               ))}
@@ -543,8 +551,9 @@ export const AcademicTemplate = React.memo(function AcademicTemplate({ data, con
                     {item.description && (
                       <div
                         className="rich-text academic-bullets mt-1 text-[0.8em] opacity-80 leading-snug pl-4"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.description) }}
-                      />
+                        >
+                      {processHtmlBullets(sanitizeHtml(item.description), item.id, bulletIds)}
+                    </div>
                     )}
                   </div>
                 ))}

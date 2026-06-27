@@ -10,6 +10,8 @@ interface MeasurementLayerProps {
   SelectedTemplate: React.ComponentType<{ data: ResumeData }> | null
   data: ResumeData
 }
+const mmToPx = (mm: number) => mm * 3.7795275591;
+
 
 export function MeasurementLayer({
   measureRef,
@@ -21,10 +23,10 @@ export function MeasurementLayer({
   return (
     <div
       ref={measureRef}
-      className="fixed -left-[10000px] top-0 pointer-events-none bg-white text-black overflow-hidden break-words"
+      className="fixed -left-[10000px] top-0 invisible pointer-events-none bg-white text-black overflow-hidden break-words"
       style={{
-        width: `${widthMm}mm`,
-        padding: `${paddingMm}mm`,
+        width: `${mmToPx(widthMm)}px`,
+        padding: `${mmToPx(paddingMm)}px`,
       }}
     >
       {SelectedTemplate && <SelectedTemplate data={data} />}
