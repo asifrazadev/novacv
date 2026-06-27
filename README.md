@@ -82,7 +82,6 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 
 ### 🛠️ Planned Features & Roadmap
 - [ ] **Expanded Template Gallery**: Additional industry-specific templates
-- [ ] **LinkedIn Sync**: Direct LinkedIn profile integration
 - [ ] **Multilingual Support**: Localized resumes for global job markets
 - [ ] **Analytics Dashboard**: Full public resume analytics — views over time, referrer tracking, geography
 - [ ] **Batch Operations**: Bulk actions on multiple resumes
@@ -150,11 +149,13 @@ docker run -d \
   postgres:16-alpine
 ```
 
-#### 3. Apply the database migration
+#### 3. Apply the database migrations
 
 ```bash
-psql postgres://postgres:postgres@localhost:5432/novacv -f drizzle/0000_init_schema.sql
+npm run migrate
 ```
+
+This runs `scripts/migrate.js` — no `psql` needed. It reads `DATABASE_URL` from your `.env.local` and applies all pending `.sql` files from `drizzle/` in order.
 
 #### 4. Configure environment variables
 

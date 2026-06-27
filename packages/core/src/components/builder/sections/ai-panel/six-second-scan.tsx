@@ -62,7 +62,7 @@ export function SixSecondScan() {
   return (
     <div className="space-y-5 mt-4">
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Simulates a recruiter&apos;s first-glance scan of your resume — the critical 6 seconds that decide whether you get a callback.
+        Simulates a recruiter&apos;s first-glance scan of your resume. The critical 6 seconds that decide whether you get a callback.
       </p>
 
       <Button
@@ -151,7 +151,7 @@ export function SixSecondScan() {
         <div className="text-center py-8 border border-dashed rounded-xl border-border/60 bg-muted/5">
           <Timer className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
           <p className="text-xs text-muted-foreground max-w-[200px] mx-auto leading-relaxed">
-            Run the scan to see what a recruiter notices — and misses — in your first 6 seconds.
+            Run the scan to see what a recruiter notices and misses in your first 6 seconds.
           </p>
         </div>
       )}

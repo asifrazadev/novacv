@@ -18,7 +18,7 @@ export function MagicLinkForm() {
     return (
       <div className="flex items-center gap-2.5 px-4 py-3 rounded-md border bg-muted/30 text-xs text-muted-foreground">
         <Mail className="w-4 h-4 shrink-0 text-primary" />
-        <span>Check your inbox — we sent you a sign-in link.</span>
+        <span>Check your inbox. We sent you a sign-in link.</span>
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { resumes } from "@/lib/db/schema"
-import { eq, and } from "drizzle-orm"
+import { eq, and, sql } from "drizzle-orm"
 import { getErrorMessage } from "@/lib/error-handler"
 import { generatePdf } from "@/lib/pdf/generatePdf"
 import { cachePrintData } from "@/lib/pdf/printCache"
@@ -67,6 +67,11 @@ export async function GET(
         headers: { "Content-Type": "application/json" },
       })
     }
+
+    db.update(resumes)
+      .set({ downloadCount: sql`${resumes.downloadCount} + 1` })
+      .where(and(eq(resumes.id, id), eq(resumes.userId, userId)))
+      .catch(() => {})
 
     return new Response(pdfBuffer as any, {
       headers: {

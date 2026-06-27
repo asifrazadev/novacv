@@ -21,7 +21,7 @@ async function main() {
     // Try loading .env.local
     try {
       const envFile = fs.readFileSync(
-        path.join(__dirname, "..", "apps", "web", ".env.local"),
+        path.join(__dirname, "..", ".env.local"),
         "utf8"
       )
       for (const line of envFile.split("\n")) {

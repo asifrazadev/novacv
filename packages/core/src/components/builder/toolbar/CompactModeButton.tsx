@@ -33,7 +33,7 @@ export function CompactModeButton() {
         },
       },
     }))
-    toast.success("Compact layout applied — adjust further in Design settings.")
+    toast.success("Compact layout applied. Adjust further in Design settings.")
   }
 
   return (
@@ -50,7 +50,7 @@ export function CompactModeButton() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Compact — shrink fonts &amp; margins to fit 1 page</p>
+          <p>Compact: shrink fonts &amp; margins to fit 1 page</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

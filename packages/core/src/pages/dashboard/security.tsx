@@ -132,7 +132,7 @@ export default function SecurityPage() {
             <CardTitle className="text-base text-destructive">Delete Account</CardTitle>
           </div>
           <CardDescription>
-            Permanently delete your account and all data — resumes, job applications, and settings.
+            Permanently delete your account and all data: resumes, job applications, and settings.
             This cannot be undone.
           </CardDescription>
         </CardHeader>

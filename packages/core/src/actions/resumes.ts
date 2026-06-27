@@ -171,6 +171,31 @@ export async function getResumePublicStats(id: string) {
   return row ?? null
 }
 
+export async function incrementDownloadCount(id: string) {
+  const userId = await getEffectiveUserId()
+  if (!userId) return
+  db.update(resumes)
+    .set({ downloadCount: sql`${resumes.downloadCount} + 1` })
+    .where(and(eq(resumes.id, id), eq(resumes.userId, userId)))
+    .catch(() => {})
+}
+
+export async function getDashboardStats() {
+  const userId = await getEffectiveUserId()
+  if (!userId) return { resumeCount: 0, totalDownloads: 0, totalViews: 0 }
+
+  const rows = await db
+    .select({ viewCount: resumes.viewCount, downloadCount: resumes.downloadCount })
+    .from(resumes)
+    .where(eq(resumes.userId, userId))
+
+  return {
+    resumeCount: rows.length,
+    totalDownloads: rows.reduce((s, r) => s + (r.downloadCount ?? 0), 0),
+    totalViews: rows.reduce((s, r) => s + (r.viewCount ?? 0), 0),
+  }
+}
+
 export async function importResumeAndCreate(title: string, resumeData: ResumeData) {
   try {
     const userId = await getEffectiveUserId()

@@ -55,6 +55,7 @@ export const resumes = pgTable("resumes", {
   data: jsonb("data").notNull().default({}),
   isPublic: boolean("is_public").notNull().default(false),
   viewCount: integer("view_count").notNull().default(0),
+  downloadCount: integer("download_count").notNull().default(0),
   lastViewedAt: timestamp("last_viewed_at", { withTimezone: true }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
