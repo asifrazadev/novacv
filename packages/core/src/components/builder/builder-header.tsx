@@ -11,6 +11,7 @@ import { Separator } from "@/components/shared/ui/separator"
 import { cn } from "@/lib/utils"
 import { ShareButton } from "@/components/builder/toolbar/ShareButton"
 import { ExportButton } from "@/components/builder/toolbar/ExportButton"
+import { CompactModeButton } from "@/components/builder/toolbar/CompactModeButton"
 import { ImportDialog } from "@/components/builder/import-dialog"
 import { MobileBuilderNav } from "@/components/builder/mobile-nav"
 
@@ -62,6 +63,7 @@ export function BuilderHeader() {
         </Button>
 
         <div className="hidden lg:flex items-center gap-2">
+          <CompactModeButton />
           <ImportDialog />
           <ShareButton />
         </div>

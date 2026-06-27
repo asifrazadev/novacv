@@ -18,7 +18,7 @@ import {
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { WelcomeGuide } from "@/components/shared/ui/welcome-guide"
-import { LayoutDashboard, Database, Link as LinkIcon, Download } from "lucide-react"
+import { LayoutDashboard, Database, Link as LinkIcon, Download, FileDown } from "lucide-react"
 
 const TRACKER_FEATURES = [
   {
@@ -256,6 +256,31 @@ export default function TrackerPage() {
     }
   }
 
+  const exportCSV = () => {
+    const headers = ["Company", "Position", "Status", "Date Applied", "Salary", "Location", "URL", "Notes"]
+    const rows = applications.map(app => [
+      app.company,
+      app.position,
+      STATUS_COLUMNS.find(c => c.id === app.status)?.label ?? app.status,
+      app.applied_at ? new Date(app.applied_at).toLocaleDateString() : "",
+      app.salary ?? "",
+      app.location ?? "",
+      app.url ?? "",
+      (app.notes ?? "").replace(/\n/g, " "),
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+
+    const csv = [headers.join(","), ...rows].join("\n")
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `novacv-applications-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   const handleMoveStatus = async (id: string, newStatus: string) => {
     // Optimistically update the UI to prevent any flashing/lag
     setApplications(prev => prev.map(app =>
@@ -311,6 +336,12 @@ export default function TrackerPage() {
             <Sparkles className="w-3.5 h-3.5 text-primary" />
             Replay Tour
           </Button>
+          {applications.length > 0 && (
+            <Button variant="outline" size="sm" onClick={exportCSV} className="h-8 text-xs gap-1.5 rounded-md border-border/40 font-medium cursor-pointer">
+              <FileDown className="w-3.5 h-3.5" />
+              Export CSV
+            </Button>
+          )}
           <Button id="tour-add-application" onClick={handleOpenCreate} size="sm" className="gap-1.5 self-start sm:self-center cursor-pointer">
             <Plus className="w-4 h-4" /> Add Application
           </Button>

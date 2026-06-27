@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db"
 import { resumes } from "@/lib/db/schema"
-import { eq, and, desc } from "drizzle-orm"
+import { eq, and, desc, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { ResumeData } from "@/types/resume"
@@ -148,7 +148,27 @@ export async function getPublicResumeById(id: string) {
     .where(and(eq(resumes.id, id), eq(resumes.isPublic, true)))
     .limit(1)
 
+  if (resume) {
+    db.update(resumes)
+      .set({ viewCount: sql`${resumes.viewCount} + 1`, lastViewedAt: new Date() })
+      .where(eq(resumes.id, id))
+      .catch(() => {})
+  }
+
   return resume ?? null
+}
+
+export async function getResumePublicStats(id: string) {
+  const userId = await getEffectiveUserId()
+  if (!userId) return null
+
+  const [row] = await db
+    .select({ viewCount: resumes.viewCount, lastViewedAt: resumes.lastViewedAt, isPublic: resumes.isPublic })
+    .from(resumes)
+    .where(and(eq(resumes.id, id), eq(resumes.userId, userId)))
+    .limit(1)
+
+  return row ?? null
 }
 
 export async function importResumeAndCreate(title: string, resumeData: ResumeData) {

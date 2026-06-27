@@ -1,6 +1,6 @@
 "use client"
 
-import { FileText, User, LogOut, Briefcase } from "lucide-react"
+import { FileText, User, LogOut, Briefcase, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import TextLogo from "@/components/shared/logotext"
@@ -34,6 +34,11 @@ const items = [
     title: "Profile",
     url: "/dashboard/profile",
     icon: User,
+  },
+  {
+    title: "Security",
+    url: "/dashboard/security",
+    icon: ShieldCheck,
   },
 ]
 

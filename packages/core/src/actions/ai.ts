@@ -517,9 +517,12 @@ export async function analyzeResumeWithAI(
     const resolvedConfig = getAIConfig(clientConfig)
     const model = getAIModel(resolvedConfig)
 
+    const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+
     const prompt = jobDescription
       ? `You are an ATS resume expert. Evaluate this resume against the job description below.
 
+Today's date: ${today}
 
 STRICT RULES — violating any of these makes your response invalid:
 
@@ -544,7 +547,7 @@ STRICT RULES — violating any of these makes your response invalid:
 16. Never suggest adding a cover letter, references section, or "references available" line.
 17. Never suggest layout or spacing changes. Spacing is template-controlled.
 18. Never suggest splitting or merging sections (e.g. separating Projects into Personal and Professional). Section structure is fixed.
-19. Never flag short summaries as insufficient. A 2-sentence summary is valid. Only flag a summary if it is completely absent.
+19. Never suggest anything about the professional summary section — do not flag it as missing, short, weak, or needing improvement. If the VERIFIED RESUME FACTS header says "summary: PRESENT", treat it as fully adequate no matter how short. If it says "ABSENT", still do not suggest it — summary is optional.
 20. Only suggest adding a missing section (e.g. Projects, Certifications) if that section type is entirely absent from the resume AND it is a standard, high-impact section for the target role.
 21. For JD matching: only flag a keyword as missing if it appears in the JD requirements or responsibilities AND is absent from the entire resume including bullets, skills, and certifications. Do not flag keywords that appear only in the "Nice to Have" section of a JD as hard gaps.
 22. A suggestion is only valid if it addresses one of these four things:
@@ -553,6 +556,10 @@ STRICT RULES — violating any of these makes your response invalid:
     - A standard section that is completely missing
     - An incomplete required field (e.g. education with no degree name, experience with no dates)
     Anything outside these four categories is not a valid suggestion.
+23. Never flag any past year or date as an error, outdated, or something to update. Dates like 2023, 2024, 2025 on a resume are historical facts — end dates of jobs, graduation years, project completion dates. They are correct by definition. Only flag a date if it contains an obvious typo (e.g. "20025").
+24. Never flag a summary as "missing" or "absent" if any text exists in the summary section. The summary may appear in a different position in the rendered text. Only suggest adding a summary if the summary section is completely empty with zero words.
+25. Never flag missing end dates on projects. Project end dates are always optional — a project without an end date is ongoing or the user intentionally left it blank. This is never a resume error.
+26. Never suggest "updating", "refreshing", or "adding recent" dates to any section. Date accuracy is the user's responsibility, not an ATS concern.
 Evaluate: keyword match against the JD, missing skills the JD requires, bullet point strength, and ATS parsing risks.
 
 Return ONLY this JSON, no extra text:
@@ -571,14 +578,13 @@ RESUME:
 ${resumeText}`
       : `You are an ATS resume expert. Evaluate this resume carefully.
 
+Today's date: ${today}
 
-STRICT RULES — violating any of these makes your response invalid:
 STRICT RULES — violating any of these makes your response invalid:
 
 1. Never invent skills, technologies, or accomplishments the user does not have.
-   When a JD keyword is missing from the resume, frame it conditionally:
-   "If you have experience with X, adding it to your Skills section would improve keyword match."
-   Never use placeholder brackets like [number], [company], or X in rewrite suggestions.
+   Only frame gaps conditionally: "If you have experience with X, adding it would strengthen the resume."
+   Never use placeholder brackets like [number], [company], or X in suggestions.
 2. Never suggest punctuation-only changes (adding/removing periods on bullets, fixing capitalization of common words). These have zero ATS impact.
 3. Never suggest renaming section headers. Template headers are fixed in the system.
 4. Never suggest merging the programming Languages skill category with the spoken Languages section. They are different data types in different fields.
@@ -596,15 +602,17 @@ STRICT RULES — violating any of these makes your response invalid:
 16. Never suggest adding a cover letter, references section, or "references available" line.
 17. Never suggest layout or spacing changes. Spacing is template-controlled.
 18. Never suggest splitting or merging sections (e.g. separating Projects into Personal and Professional). Section structure is fixed.
-19. Never flag short summaries as insufficient. A 2-sentence summary is valid. Only flag a summary if it is completely absent.
+19. Never suggest anything about the professional summary section — do not flag it as missing, short, weak, or needing improvement. If the VERIFIED RESUME FACTS header says "summary: PRESENT", treat it as fully adequate no matter how short. If it says "ABSENT", still do not suggest it — summary is optional.
 20. Only suggest adding a missing section (e.g. Projects, Certifications) if that section type is entirely absent from the resume AND it is a standard, high-impact section for the target role.
-21. For JD matching: only flag a keyword as missing if it appears in the JD requirements or responsibilities AND is absent from the entire resume including bullets, skills, and certifications. Do not flag keywords that appear only in the "Nice to Have" section of a JD as hard gaps.
-22. A suggestion is only valid if it addresses one of these four things:
-    - A keyword required by the JD that is genuinely absent from the resume
+21. Never flag any past year or date as an error, outdated, or something to update. Dates like 2022, 2023, 2024, 2025 on a resume are historical facts — end dates of jobs, graduation years, project dates. They are correct by definition. Only flag a date if it contains an obvious typo (e.g. "20025").
+22. Never mention the professional summary in any suggestion. The VERIFIED RESUME FACTS header at the top of the resume tells you whether one exists. Do not override it, question it, or suggest improving it.
+23. Never flag missing end dates on projects. Project end dates are always optional — a project without an end date is ongoing or intentionally left blank. This is never a resume error.
+24. Never suggest "updating", "refreshing", or "making dates more recent". Date accuracy is the user's responsibility.
+25. A suggestion is only valid if it addresses one of these three things:
     - A bullet point that is vague where a specific technical detail would add real clarity
-    - A standard section that is completely missing
-    - An incomplete required field (e.g. education with no degree name, experience with no dates)
-    Anything outside these four categories is not a valid suggestion.
+    - A standard section that is completely missing (zero content, not just short)
+    - An incomplete required field (e.g. education with no degree name, experience with no company name)
+    Anything outside these three categories is not a valid suggestion.
 Return ONLY this JSON, no extra text:
 {
   "score": <number 0-100>,
@@ -1059,6 +1067,126 @@ export async function suggestContentWithAI(
   } catch (error) {
     const message = getErrorMessage(error)
     console.error(`[AI] suggestContentWithAI failed:`, message)
+    return { success: false, error: message }
+  }
+}
+
+// --- Cover Letter Generation ---
+
+interface CoverLetterResult {
+  success: boolean
+  text?: string
+  error?: string
+}
+
+export async function generateCoverLetterWithAI(
+  resumeText: string,
+  jobDescription: string,
+  clientConfig: ClientConfig
+): Promise<CoverLetterResult> {
+  try {
+    const resolvedConfig = getAIConfig(clientConfig)
+    const model = getAIModel(resolvedConfig)
+
+    const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+
+    const { text } = await generateText({
+      model,
+      system: `You are an expert career coach and professional cover letter writer.
+Write concise, compelling cover letters that are personalized to the job and resume.
+Output plain text only — no markdown, no HTML, no headers like "Cover Letter:". Just the letter body.
+Today's date: ${today}`,
+      prompt: `Write a professional cover letter for this candidate applying to the job below.
+
+RESUME:
+${resumeText}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Guidelines:
+- 3 paragraphs: hook + why you're a fit + call to action
+- Weave in 2-3 specific achievements from the resume
+- Mirror 3-4 keywords from the job description naturally
+- Warm but professional tone
+- No generic filler phrases like "I am writing to express my interest"
+- Do NOT include address headers, date, or signature block — just the letter body paragraphs`,
+    })
+
+    return { success: true, text: text.trim() }
+  } catch (error) {
+    const message = getErrorMessage(error)
+    console.error(`[AI] generateCoverLetterWithAI failed:`, message)
+    return { success: false, error: message }
+  }
+}
+
+// --- 6-Second Recruiter Scan ---
+
+interface ScanResult {
+  success: boolean
+  result?: {
+    firstSeen: string
+    strengths: string[]
+    concerns: string[]
+    verdict: string
+  }
+  error?: string
+}
+
+const scanResultSchema = z.object({
+  firstSeen: z.string().describe("What catches the recruiter's eye in the first 2 seconds"),
+  strengths: z.array(z.string()).min(1).max(4).describe("2-4 things that immediately stand out positively"),
+  concerns: z.array(z.string()).min(0).max(4).describe("0-4 things that are confusing, missing, or weak at first glance"),
+  verdict: z.string().describe("The recruiter's gut-check verdict in one sentence: does this resume make the shortlist cut?"),
+})
+
+const SCAN_RESULT_TEMPLATE = `{
+  "firstSeen": "What the recruiter notices first",
+  "strengths": ["Strength 1", "Strength 2"],
+  "concerns": ["Concern 1"],
+  "verdict": "One-sentence recruiter gut-check verdict"
+}`
+
+export async function sixSecondScanWithAI(
+  resumeText: string,
+  clientConfig: ClientConfig
+): Promise<ScanResult> {
+  try {
+    const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    const resolvedConfig = getAIConfig(clientConfig)
+    const model = getAIModel(resolvedConfig)
+
+    const object = await generateObjectWithFallback({
+      model,
+      schema: scanResultSchema,
+      schemaPromptName: "ScanResult",
+      schemaTemplate: SCAN_RESULT_TEMPLATE,
+      system: `You are a senior technical recruiter at a top tech company. You review hundreds of resumes a day.
+You are brutally honest. You speak like a recruiter thinking out loud, not a career coach giving generic advice.
+Be specific — name actual sections, words, or gaps you see.
+Today's date: ${today}
+
+HARD RULES — violating these makes your scan invalid:
+1. Never list a past date (2022, 2023, 2024, 2025) as a concern. A job that ended in 2025 is recent — the candidate started looking in 2026. Dates on a resume are historical facts, not errors.
+2. If VERIFIED RESUME FACTS says "summary: PRESENT", never list "no summary" or "missing summary" as a concern.
+3. Never flag missing end dates on projects as a red flag. Ongoing or intentionally blank project dates are normal.
+4. Never suggest that the candidate needs to update their dates or refresh their timeline.
+5. The VERIFIED RESUME FACTS block at the top of the resume is ground truth. Do not contradict it.`,
+      prompt: `You have 6 seconds to scan this resume. Respond as if you are thinking out loud during that scan.
+
+What do you notice first? What stands out? What immediately raises a red flag or is missing?
+Be specific. Name actual content you see or don't see. Think fast.
+
+RESUME:
+${resumeText}`,
+      config: resolvedConfig,
+    })
+
+    return { success: true, result: object }
+  } catch (error) {
+    const message = getErrorMessage(error)
+    console.error(`[AI] sixSecondScanWithAI failed:`, message)
     return { success: false, error: message }
   }
 }

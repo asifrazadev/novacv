@@ -1,7 +1,11 @@
 import { ResumeData } from "@/types/resume"
+import { getTemplate } from "@/templates/index"
 
 // Helper to extract clean content of all sections and basics as structured JSON
 export function extractResumeText(data: ResumeData): string {
+  const { features } = getTemplate(data.metadata.template)
+  const skillsMode = data.metadata.skillsMode ?? "category"
+
   const cleanData = {
     basics: {
       name: data.basics.name,
@@ -53,15 +57,14 @@ export function extractResumeText(data: ResumeData): string {
         startDate: p.startDate,
         endDate: p.endDate
       })) || [],
-      skills: data.sections.skills?.map(s => ({
-        name: s.name,
-        level: s.level,
-        keywords: s.keywords
-      })) || [],
-      languages: data.sections.languages?.map(l => ({
-        name: l.name,
-        level: l.level
-      })) || [],
+      skills: data.sections.skills?.map(s =>
+        skillsMode === "category"
+          ? { name: s.name, keywords: s.keywords }
+          : features.skillLevel ? { name: s.name, level: s.level } : { name: s.name }
+      ) || [],
+      languages: data.sections.languages?.map(l =>
+        features.languageLevel ? { name: l.name, level: l.level } : { name: l.name }
+      ) || [],
       interests: data.sections.interests?.map(i => ({
         name: i.name
       })) || [],

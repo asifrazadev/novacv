@@ -38,8 +38,8 @@ export const defaultItems: Record<string, any> = {
   publications: { name: "", publisher: "", date: "", url: "", websiteLabel: "", showLinkInTitle: false, description: "" },
   volunteer: { organization: "", position: "", startDate: "", endDate: "", isCurrent: false, website: "", websiteLabel: "", showLinkInTitle: false, description: "" },
   references: { name: "", position: "", phone: "", email: "", website: "", websiteLabel: "", showLinkInTitle: false, description: "" },
-  skills: { name: "", level: 100 },
-  languages: { name: "", level: 100 },
+  skills: { name: "", level: 0 },
+  languages: { name: "", level: 0 },
   interests: { name: "" },
 }
 

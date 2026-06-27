@@ -30,8 +30,8 @@ export interface BuilderUIContextType {
   setShowAiPanel: React.Dispatch<React.SetStateAction<boolean>>
   tourOpen: boolean
   setTourOpen: React.Dispatch<React.SetStateAction<boolean>>
-  activeAiTab: "ats" | "rewrite" | "suggest"
-  setActiveAiTab: React.Dispatch<React.SetStateAction<"ats" | "rewrite" | "suggest">>
+  activeAiTab: "ats" | "rewrite" | "suggest" | "coverletter" | "scan"
+  setActiveAiTab: React.Dispatch<React.SetStateAction<"ats" | "rewrite" | "suggest" | "coverletter" | "scan">>
 }
 
 export interface BuilderMetaContextType {

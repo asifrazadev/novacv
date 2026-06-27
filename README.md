@@ -49,19 +49,45 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 - **Adjustable Margins**: Custom margin/padding controls to regulate whitespace and balance page content layout.
 - **Raw CSS Sandbox**: Write customized CSS code blocks directly in-editor for custom templates style overriding.
 
-#### **Export, Sharing & Security**
-- **High-Fidelity PDF Export**: Dual-engine generation (server-side Playwright rendering or client-side react-pdf renderer) for pixel-perfect printouts.
+#### **Export, Sharing & Analytics**
+- **High-Fidelity PDF Export**: Server-side Playwright rendering — the browser lays out the resume exactly as seen, Playwright captures it as a pixel-perfect PDF.
 - **Word Document (.docx) Export**: Download resume as a native Microsoft Word document using structural tables and paragraph formatting.
 - **Public Sharing**: Generate unique, secure links to share a web-viewable, read-only copy of your resume.
-- **Authentication**: Auth.js (NextAuth v5) with email/password and OAuth provider support.
+- **Public Link Analytics**: View count and last-viewed timestamp tracked on every shared resume link. QR code auto-generated for the public URL — scan to open on mobile.
+- **One-Click Compact Mode**: Smart layout shrink that reduces font sizes and margins to squeeze a two-page resume down to one page within readable limits. Toggle to restore.
+
+#### **Authentication & Security**
+- **Auth.js (NextAuth v5)**: Email/password credentials, Google and GitHub OAuth, JWT sessions with DrizzleAdapter.
+- **Magic Link Sign-In**: Email-only passwordless sign-in via Nodemailer — no password required.
+- **Two-Factor Authentication (TOTP)**: Authenticator app 2FA (Google Authenticator, Authy, etc.) with QR code setup flow and manual entry fallback.
+- **Account Deletion**: Self-service account wipe — permanently deletes the account, all resumes, and job applications after explicit confirmation.
+
+#### **AI Tools**
+- **Cover Letter Generator**: Paste a job description and generate a tailored 3-paragraph cover letter that weaves in your resume achievements and mirrors the JD keywords.
+- **6-Second Recruiter Scan**: Simulates a recruiter's first-glance — AI reports what it notices first, what stands out positively, immediate red flags, and a gut-check verdict on whether the resume makes the shortlist.
+
+#### **Job Application Tracker**
+- **Kanban Board**: Track job applications across status columns with drag-and-drop reordering.
+- **CSV Export**: Download the full tracker board as a CSV with company, position, status, date applied, salary, location, URL, and notes.
+
+#### **Keyboard Shortcuts**
+| Shortcut | Action |
+|---|---|
+| `Cmd/Ctrl+S` | Confirm auto-save |
+| `Cmd/Ctrl+P` | Export as PDF |
+| `Cmd/Ctrl+/` | Toggle AI panel |
+| `Alt+↓` | Next section |
+| `Alt+↑` | Previous section |
+| `Escape` | Close active editor section |
 
 ### 🛠️ Planned Features & Roadmap
 - [ ] **Expanded Template Gallery**: Additional industry-specific templates
-- [ ] **LinkedIn Sync**: Direct LinkedIn profile integration (UI in progress)
+- [ ] **LinkedIn Sync**: Direct LinkedIn profile integration
 - [ ] **Multilingual Support**: Localized resumes for global job markets
-- [ ] **Analytics Dashboard**: Track views, downloads, and engagement metrics for shared resumes
+- [ ] **Analytics Dashboard**: Full public resume analytics — views over time, referrer tracking, geography
 - [ ] **Batch Operations**: Bulk actions on multiple resumes
 - [ ] **Template Marketplace**: Community-created templates
+- [ ] **Resume Versioning**: Save and restore previous versions of a resume
 
 ## 🛠️ Tech Stack
 
@@ -75,7 +101,6 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 - **UI Components**: [Shadcn UI](https://ui.shadcn.com) - Accessible component library built on Radix UI
 - **Document Generation**: 
   - [Playwright Core](https://playwright.dev) - Server-side PDF rendering for high-fidelity exports
-  - [@react-pdf/renderer](https://react-pdf.org) - Client-side alternative PDF rendering engine
   - [docx](https://docx.js.org/) - Direct MS Word document (.docx) generation
 - **Icons**: [Lucide React](https://lucide.dev) & [React Social Icons](https://jaketrent.com/react-social-icons/)
 - **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai) - Multi-provider AI support
@@ -325,7 +350,7 @@ Our integrated AI assistant helps you:
 - **Score against ATS systems** for better applicant tracking compatibility
 
 ### Secure Resume Sharing
-Generate unique, secure URLs to share your resume without exposing personal information. Track who views your shared resume (coming soon in analytics dashboard).
+Generate unique, secure URLs to share your resume without exposing personal information. A QR code is auto-generated for mobile sharing, and every link tracks view count and last-viewed timestamp.
 
 ### Multi-Template Support
 Switch between professionally designed templates without losing your data. Each template adapts your content intelligently.
@@ -365,15 +390,16 @@ Found a bug or have a feature idea?
 
 ### Next Steps (Q3 2026)
 - 📱 Enhanced mobile builder experience
-- 🎨 Template customization UI
-- 📊 Public analytics dashboard for shared resumes
+- 🎨 Additional resume templates
+- 📊 Full public resume analytics dashboard
+- 🔢 Resume versioning — save and restore snapshots
 
 ### Future (Q4 2026+)
 - 🌐 Multilingual resume support
 - 💼 LinkedIn profile sync
-- 📧 Email-based resume sharing
-- 🔗 Applicant tracking system (ATS) integrations
+- 🔗 ATS system integrations
 - 🎓 Industry-specific templates
+- 🛒 Community template marketplace
 
 ---
 

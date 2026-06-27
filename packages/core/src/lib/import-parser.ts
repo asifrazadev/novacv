@@ -276,16 +276,16 @@ function parseJsonResume(rawData: any, currentMetadata?: ResumeData["metadata"])
       .map((s: any) => ({
         id: uuidv4(),
         name: s.name || "",
-        level: 100,
+        level: s.level ?? 0,
         keywords: Array.isArray(s.keywords) ? s.keywords : (s.keywords ? [s.keywords] : [])
       }))
-      .filter((s: any) => s.name) // Only keep skills with names
+      .filter((s: any) => s.name)
   } else if (rawData.skills && typeof rawData.skills === "object") {
     data.sections.skills = Object.entries(rawData.skills)
       .map(([categoryName, keywords]) => ({
         id: uuidv4(),
         name: categoryName,
-        level: 100,
+        level: 0,
         keywords: Array.isArray(keywords) ? keywords.map(String) : []
       }))
       .filter((s: any) => s.name)

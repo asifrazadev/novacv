@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Target, PenTool, Brain, Sparkles } from "lucide-react"
+import { Target, PenTool, Brain, Sparkles, FileText, Timer } from "lucide-react"
 import { useBuilder, useBuilderUI } from "@/components/builder/builder-context"
 import { ScrollArea } from "@/components/shared/ui/scroll-area"
 import { Button } from "@/components/shared/ui/button"
@@ -9,12 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { AtsScoring } from "./ats-scoring"
 import { AiRewriter } from "./ai-rewriter"
 import { AiSuggestions } from "./ai-suggestions"
+import { CoverLetter } from "./cover-letter"
+import { SixSecondScan } from "./six-second-scan"
 import { calculateCleanStats, extractResumeText } from "./utils"
 
 const AI_TABS = [
   { id: "ats" as const, icon: Target, label: "ATS Score" },
   { id: "rewrite" as const, icon: PenTool, label: "AI Rewriter" },
   { id: "suggest" as const, icon: Brain, label: "Suggestions" },
+  { id: "coverletter" as const, icon: FileText, label: "Cover Letter" },
+  { id: "scan" as const, icon: Timer, label: "6-Sec Scan" },
 ]
 
 export function AIPanel() {
@@ -45,7 +49,7 @@ export function AIPanel() {
 
   const isPanelVisible = showAiPanel || (!isDesktop && mobileView === "ai")
 
-  const handleTabClick = (tabId: "ats" | "rewrite" | "suggest") => {
+  const handleTabClick = (tabId: "ats" | "rewrite" | "suggest" | "coverletter" | "scan") => {
     if (!isPanelVisible) {
       setActiveAiTab(tabId)
       setShowAiPanel(true)
@@ -69,7 +73,7 @@ export function AIPanel() {
             <div className="p-4 border-b border-border/40 bg-muted/20 backdrop-blur-md flex items-center justify-between min-h-[57px] shrink-0">
               <h2 className="text-xs font-bold tracking-wider uppercase text-foreground/75 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
-                {activeAiTab === "ats" ? "ATS Score" : activeAiTab === "rewrite" ? "AI Rewriter" : "Suggestions"}
+                {activeAiTab === "ats" ? "ATS Score" : activeAiTab === "rewrite" ? "AI Rewriter" : activeAiTab === "suggest" ? "Suggestions" : activeAiTab === "coverletter" ? "Cover Letter" : "6-Sec Scan"}
               </h2>
               {/* Close button for overlay/drawer */}
               <Button
@@ -95,6 +99,12 @@ export function AIPanel() {
                 )}
                 {activeAiTab === "suggest" && (
                   <AiSuggestions />
+                )}
+                {activeAiTab === "coverletter" && (
+                  <CoverLetter />
+                )}
+                {activeAiTab === "scan" && (
+                  <SixSecondScan />
                 )}
               </div>
             </ScrollArea>

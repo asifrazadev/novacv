@@ -1,1 +1,1 @@
-export { default } from "@/pages/dashboard/security";
+export { default } from "@/pages/dashboard/security"

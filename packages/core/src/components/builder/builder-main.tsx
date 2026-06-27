@@ -2,6 +2,9 @@
 
 import * as React from "react"
 import { useBuilder, useBuilderUI } from "@/components/builder/builder-context"
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
+import { sections, design } from "@/components/builder/sidebar-rail"
+import { exportResumeToPDF } from "@/lib/export/exportPdf"
 import { SidebarRail } from "@/components/builder/sidebar-rail"
 import { SidebarPanel } from "@/components/builder/sidebar-panel"
 import { PreviewCanvas } from "@/components/builder/preview-canvas"
@@ -64,7 +67,29 @@ const BUILDER_STEPS = [
 
 export function BuilderMain() {
   const { mobileView, setMobileView, showAiPanel, setShowAiPanel, tourOpen, setTourOpen } = useBuilderUI()
-  const { activeSection } = useBuilder()
+  const { activeSection, setActiveSection, data, resumeId, title } = useBuilder()
+
+  const allSectionIds = React.useMemo(() => [
+    ...sections.map(s => s.id),
+    ...((data?.sections as any)?.customSections?.map((s: any) => s.id) ?? []),
+    ...design.map(s => s.id),
+  ], [(data?.sections as any)?.customSections])
+
+  useKeyboardShortcuts({
+    onToggleAiPanel: () => setShowAiPanel(prev => !prev),
+    onCloseSection: () => setActiveSection(""),
+    onNextSection: () => {
+      if (!activeSection) { setActiveSection(allSectionIds[0]); return }
+      const idx = allSectionIds.indexOf(activeSection)
+      if (idx < allSectionIds.length - 1) setActiveSection(allSectionIds[idx + 1])
+    },
+    onPrevSection: () => {
+      if (!activeSection) return
+      const idx = allSectionIds.indexOf(activeSection)
+      setActiveSection(idx <= 0 ? "" : allSectionIds[idx - 1])
+    },
+    onExportPDF: () => exportResumeToPDF(resumeId, `${title || "resume"}.pdf`),
+  })
   const [aiWidth, setAiWidth] = React.useState(380)
   const [isResizing, setIsResizing] = React.useState(false)
   const [isMounted, setIsMounted] = React.useState(false)

@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
   passwordHash: text("password_hash"),
+  totpSecret: text("totp_secret"),
+  totpEnabled: boolean("totp_enabled").notNull().default(false),
   professionalTitle: text("professional_title"),
   bio: text("bio"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -52,6 +54,8 @@ export const resumes = pgTable("resumes", {
   title: text("title").notNull(),
   data: jsonb("data").notNull().default({}),
   isPublic: boolean("is_public").notNull().default(false),
+  viewCount: integer("view_count").notNull().default(0),
+  lastViewedAt: timestamp("last_viewed_at", { withTimezone: true }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

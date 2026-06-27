@@ -6,7 +6,6 @@ import { Button } from "@/components/shared/ui/button"
 import { Card, CardDescription, CardTitle } from "@/components/shared/ui/card"
 import { CreateResumeDialog } from "@/components/dashboard/create-resume-dialog"
 import { ImportResumeDialog } from "@/components/dashboard/import-resume-dialog"
-import { LinkedInSyncDialog } from "@/components/dashboard/linkedin-sync-dialog"
 import { getResumes } from "@/actions/resumes"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
@@ -31,18 +30,10 @@ const DASHBOARD_FEATURES = [
   }
 ]
 
-function LinkedInIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className || "w-4 h-4"} fill="currentColor">
-      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-    </svg>
-  )
-}
 
 export function DashboardClient({ initialResumes }: { initialResumes: any[] }) {
   const [createOpen, setCreateOpen] = React.useState(false)
   const [importOpen, setImportOpen] = React.useState(false)
-  const [linkedinOpen, setLinkedinOpen] = React.useState(false)
   const [tourOpen, setTourOpen] = React.useState(false)
   const [resumes, setResumes] = React.useState<any[]>(initialResumes)
   const [isLoading, setIsLoading] = React.useState(false)
@@ -100,7 +91,7 @@ export function DashboardClient({ initialResumes }: { initialResumes: any[] }) {
       </div>
 
       {/* OPTIONS GRID */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {/* Option 1: Create fresh */}
         <Card
           onClick={() => setCreateOpen(true)}
@@ -157,44 +148,11 @@ export function DashboardClient({ initialResumes }: { initialResumes: any[] }) {
           </div>
         </Card>
 
-        {/* Option 3: LinkedIn Sync */}
-        <Card
-          onClick={() => setLinkedinOpen(true)}
-          className="group relative flex flex-col justify-between overflow-hidden border border-border/40 hover:border-border/80 hover:shadow-lg transition-all duration-300 cursor-pointer bg-card/40 backdrop-blur-sm p-5"
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between w-full">
-              <div className="w-10 h-10 rounded-lg bg-foreground/5 dark:bg-foreground/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <LinkedInIcon className="w-5 h-5 text-foreground" />
-              </div>
-              <span className="text-[9px] font-mono text-muted-foreground border border-border/60 rounded px-1.5 py-0.5 uppercase tracking-wider bg-background">
-                Soon
-              </span>
-            </div>
-            <div className="space-y-1">
-              <CardTitle className="text-base font-semibold">Import from LinkedIn</CardTitle>
-              <CardDescription className="text-xs text-muted-foreground leading-relaxed">
-                Sync your complete work history, certifications, and skills profile directly into templates.
-              </CardDescription>
-            </div>
-          </div>
-          <div className="mt-5">
-            <Button
-              variant="outline"
-              disabled
-              className="w-full justify-between h-9 rounded-md border-border/80 text-xs font-normal opacity-60 cursor-not-allowed"
-            >
-              Sync profile
-              <LinkedInIcon className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-        </Card>
       </div>
 
       {/* Dialogs */}
       <CreateResumeDialog open={createOpen} onOpenChange={setCreateOpen} />
       <ImportResumeDialog open={importOpen} onOpenChange={setImportOpen} />
-      <LinkedInSyncDialog open={linkedinOpen} onOpenChange={setLinkedinOpen} />
 
       {/* RECENT WORK SECTION */}
       <div className="space-y-5" id="tour-recent-resumes">

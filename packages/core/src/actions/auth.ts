@@ -7,6 +7,7 @@ import { db } from "@/lib/db"
 import { users, verificationTokens } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import bcrypt from "bcryptjs"
+import { verify as totpVerify, generateSecret as totpGenerateSecret } from "otplib"
 import { AuthError } from "next-auth"
 import crypto from "crypto"
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/mail"
@@ -20,12 +21,17 @@ export async function login(formData: FormData) {
     })
   } catch (error) {
     if (error instanceof AuthError) {
-      if (error.cause?.err?.message === "unverified_email") {
+      const cause = error.cause?.err?.message
+      if (cause === "unverified_email") {
         const email = formData.get("email") as string
-        if (email) {
-          await resendVerificationEmail(email).catch(console.error)
-        }
+        if (email) await resendVerificationEmail(email).catch(console.error)
         redirect(`/login?message=${encodeURIComponent("Please verify your email address to log in. We just sent you a new verification link.")}`)
+      }
+      if (cause === "totp_required") {
+        redirect(`/login?step=totp`)
+      }
+      if (cause === "invalid_totp") {
+        redirect(`/login?step=totp&message=${encodeURIComponent("Invalid authenticator code. Please try again.")}`)
       }
       redirect(`/login?message=${encodeURIComponent("Invalid email or password")}`)
     }
@@ -209,6 +215,83 @@ export async function updateEmail(formData: FormData) {
 export async function signInWithProvider(formData: FormData) {
   const provider = formData.get("provider") as string
   await signIn(provider, { redirectTo: "/dashboard" })
+}
+
+export async function sendMagicLink(formData: FormData) {
+  const email = formData.get("email") as string
+  if (!email) redirect("/login?message=Email+is+required")
+  await signIn("nodemailer", { email, redirectTo: "/dashboard" })
+}
+
+// ── TOTP (authenticator app) ─────────────────────────────────────────────────
+
+export async function checkCredentialsForTOTP(email: string, password: string) {
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1)
+  const user = result[0]
+  if (!user?.passwordHash) return { error: "invalid_credentials" as const }
+  const valid = await bcrypt.compare(password, user.passwordHash)
+  if (!valid) return { error: "invalid_credentials" as const }
+  if (!user.emailVerified) {
+    await resendVerificationEmail(email).catch(console.error)
+    return { error: "unverified_email" as const }
+  }
+  if (user.totpEnabled) return { totpRequired: true as const }
+  await signIn("credentials", { email, password, redirectTo: "/dashboard" })
+}
+
+export async function loginWithTOTP(email: string, password: string, totpCode: string) {
+  try {
+    await signIn("credentials", { email, password, totpCode, redirectTo: "/dashboard" })
+  } catch (error) {
+    if (error instanceof AuthError) {
+      const cause = (error as any).cause?.err?.message
+      if (cause === "invalid_totp") return { error: "Invalid authenticator code." }
+      return { error: "Sign in failed." }
+    }
+    throw error
+  }
+}
+
+export async function generateTOTPSetup() {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+  const secret = totpGenerateSecret()
+  const label = encodeURIComponent(session.user.email ?? session.user.id)
+  const otpauthUrl = `otpauth://totp/${label}?secret=${secret}&issuer=NovaCV`
+  return { secret, otpauthUrl }
+}
+
+export async function verifyAndEnableTOTP(secret: string, code: string) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+  const { valid: ok } = await totpVerify({ token: code.trim(), secret })
+  if (!ok) return { error: "Invalid code — check your authenticator app and try again." }
+  await db.update(users).set({ totpSecret: secret, totpEnabled: true }).where(eq(users.id, session.user.id))
+  return { success: true as const }
+}
+
+export async function disableTOTP(code: string) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+  const [user] = await db.select({ totpSecret: users.totpSecret }).from(users).where(eq(users.id, session.user.id)).limit(1)
+  if (!user?.totpSecret) return { error: "TOTP is not enabled" }
+  const { valid: ok } = await totpVerify({ token: code.trim(), secret: user.totpSecret })
+  if (!ok) return { error: "Invalid code." }
+  await db.update(users).set({ totpSecret: null, totpEnabled: false }).where(eq(users.id, session.user.id))
+  return { success: true as const }
+}
+
+// ── Account deletion ─────────────────────────────────────────────────────────
+
+export async function deleteAccount(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) redirect("/login")
+  const confirmation = formData.get("confirmation") as string
+  if (confirmation !== "delete my account") {
+    redirect("/dashboard/security?message=Type the confirmation phrase exactly as shown")
+  }
+  await db.delete(users).where(eq(users.id, session.user.id))
+  await signOut({ redirectTo: "/" })
 }
 
 export async function updateProfileMetadata(formData: FormData) {
