@@ -30,6 +30,7 @@ export default auth((req) => {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
     pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/auth/") ||
     pathname.startsWith("/api/health") ||
     pathname.startsWith("/terms") ||
     pathname.startsWith("/privacy") ||

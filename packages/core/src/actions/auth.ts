@@ -20,6 +20,13 @@ export async function login(formData: FormData) {
     })
   } catch (error) {
     if (error instanceof AuthError) {
+      if (error.cause?.err?.message === "unverified_email") {
+        const email = formData.get("email") as string
+        if (email) {
+          await resendVerificationEmail(email).catch(console.error)
+        }
+        redirect(`/login?message=${encodeURIComponent("Please verify your email address to log in. We just sent you a new verification link.")}`)
+      }
       redirect(`/login?message=${encodeURIComponent("Invalid email or password")}`)
     }
     throw error
@@ -46,24 +53,29 @@ export async function signup(formData: FormData) {
 
   try {
     const token = await generateVerificationToken(email)
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const baseUrl = getBaseUrl()
     await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
   } catch (err) {
     console.error("Failed to send verification email:", err)
   }
 
-  try {
-    await signIn("credentials", {
-      email,
-      password,
-      redirectTo: "/dashboard",
-    })
-  } catch (error) {
-    if (error instanceof AuthError) {
-      redirect("/login?message=Account created. Please sign in.")
-    }
-    throw error
+  redirect("/register?status=success")
+}
+
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL
   }
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  return "http://localhost:3000"
 }
 
 export async function generateVerificationToken(email: string) {
@@ -71,7 +83,7 @@ export async function generateVerificationToken(email: string) {
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
   await db.delete(verificationTokens).where(eq(verificationTokens.identifier, email))
-  
+
   await db.insert(verificationTokens).values({
     identifier: email,
     token,
@@ -83,7 +95,7 @@ export async function generateVerificationToken(email: string) {
 
 export async function resendVerificationEmail(email: string) {
   const token = await generateVerificationToken(email)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const baseUrl = getBaseUrl()
   await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
 }
 

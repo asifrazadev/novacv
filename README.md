@@ -95,7 +95,7 @@ NovaCV is a high-fidelity, open-source resume builder designed for the modern jo
 
 ### Prerequisites
 
-- **Node.js** 20+ (LTS recommended)
+- **Node.js** 22+ (required by `@sparticuz/chromium` for PDF export)
 - **npm** 10.8+
 - A **PostgreSQL** database (local install, Docker, or any managed Postgres)
 - (Optional) AI provider API keys for AI features
@@ -193,13 +193,19 @@ docker compose up --build
 Docker Compose will:
 1. Start PostgreSQL 16
 2. Apply the schema migration automatically
-3. Start the Next.js app
+3. Build and start the Next.js app
 
 | Service | URL |
 |---|---|
 | App | http://localhost:3000 |
 
-Open http://localhost:3000, click **Register**, and create an account.
+> **Auth is disabled by default** in the Docker build so you can use the app immediately without setting up email/OAuth. To enable multi-user auth, pass the build arg:
+> ```bash
+> NEXT_PUBLIC_AUTH_ENABLED=true docker compose up --build
+> ```
+> Or set `NEXT_PUBLIC_AUTH_ENABLED: "true"` in the `build.args` block of `docker-compose.yml`.
+
+Open http://localhost:3000 and start building your resume.
 
 #### Stop / restart
 

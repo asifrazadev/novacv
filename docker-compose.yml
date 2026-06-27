@@ -1,0 +1,85 @@
+## NovaCV — self-contained offline stack (Postgres-first, no Supabase)
+## Run: docker compose up --build
+## App: http://localhost:3000
+
+volumes:
+  db_data:
+
+services:
+
+  # ── Database ─────────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: novacv
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d novacv"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ── Migration runner (one-shot — exits after schema is applied) ───────────────
+  migrator:
+    image: postgres:16-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./drizzle:/migrations:ro
+    command: >
+      sh -c "
+        for f in /migrations/*.sql; do
+          echo \"Running $$f\";
+          psql -h db -U postgres -d novacv -f \"$$f\" || exit 1;
+        done;
+        echo 'All migrations applied.'
+      "
+
+  # ── Next.js web app ───────────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_AUTH_ENABLED: "false"
+    image: novacv-web
+    container_name: novacv-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      RENDER: "true"
+      DATABASE_URL: postgres://postgres:postgres@db:5432/novacv
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-change-me-use-openssl-rand-base64-32}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # AI provider keys — all optional, add whichever you have
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

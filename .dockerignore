@@ -1,0 +1,14 @@
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.next
+.turbo
+node_modules
+apps/web/.next
+apps/web/node_modules
+packages/core/node_modules
+Dockerfile
+.dockerignore
+.git

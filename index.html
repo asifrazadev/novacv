@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dev Community | DevWeekends</title>
+    <style>
+        /* ---------- BASIC RESET ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #222222;
+            line-height: 1.6;
+        }
+
+        section {
+            padding: 50px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 15px;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        /* ---------- HERO SECTION ---------- */
+        .hero {
+            text-align: center;
+            background-color: #fafafa;
+        }
+
+        .hero p {
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+        }
+
+        .hero-buttons button {
+            font-family: inherit;
+            font-size: 16px;
+            padding: 10px 25px;
+            margin: 5px;
+            border: 1px solid #333333;
+            background-color: #ffffff;
+            cursor: pointer;
+        }
+
+        .hero-buttons button:hover {
+            background-color: #eeeeee;
+        }
+
+        /* ---------- RELATIVE POSITIONING BADGE ---------- */
+        .event-banner {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            position: relative;
+            /* normal position of the badge */
+            top: -8px;
+            /* moves the badge up slightly */
+            left: 4px;
+            /* moves the badge right slightly */
+            background-color: #333333;
+            color: #ffffff;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        /* ---------- OUR VALUES (FLEXBOX) ---------- */
+        .values-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .value-card {
+            background-color: #f8f8f8;
+            border: 1px solid #dddddd;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+        }
+
+        /* ---------- BOX MODEL SECTION ---------- */
+        .box-demo {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .box {
+            background-color: #f0f0f0;
+            width: 180px;
+            text-align: center;
+        }
+
+        .box-padding {
+            padding: 30px;
+            border: 1px solid #999999;
+            margin: 5px;
+        }
+
+        .box-margin {
+            padding: 10px;
+            border: 1px solid #999999;
+            margin: 30px;
+        }
+
+        .box-border {
+            padding: 10px;
+            border: 6px solid #555555;
+            margin: 5px;
+        }
+
+        /* ---------- WHY JOIN US (CSS GRID - AUTO FIT) ---------- */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .why-item {
+            background-color: #f8f8f8;
+            border: 1px solid #dddddd;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* ---------- COMMUNITY PILLARS (CSS GRID AREAS) ---------- */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-areas:
+                "mentorship opensource workshops"
+                "collaboration collaboration community";
+            gap: 15px;
+        }
+
+        .pillars-grid div {
+            background-color: #f0f0f0;
+            border: 1px solid #dddddd;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .mentorship {
+            grid-area: mentorship;
+        }
+
+        .opensource {
+            grid-area: opensource;
+        }
+
+        .workshops {
+            grid-area: workshops;
+        }
+
+        .collaboration {
+            grid-area: collaboration;
+        }
+
+        .community {
+            grid-area: community;
+        }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #dddddd;
+            margin-top: 30px;
+        }
+
+        /* ---------- BASIC MEDIA QUERIES ---------- */
+        @media (max-width: 768px) {
+            .pillars-grid {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "mentorship"
+                    "opensource"
+                    "workshops"
+                    "collaboration"
+                    "community";
+            }
+
+            .value-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ---------- HEADER ---------- -->
+    <header>
+        <h2>The Dev Community</h2>
+    </header>
+
+    <!-- ---------- HERO SECTION ---------- -->
+    <section class="hero">
+        <h1>Welcome to The DevWeekends Community</h1>
+        <p>
+            We are a community of web-developers who learn, build, and grow together.
+            Join us to connect with peers, share knowledge, and work on real projects
+            through mentorship, workshops, and open-source collaboration.
+        </p>
+
+        <div class="hero-buttons">
+            <button>Join Our Community</button>
+            <button>Explore</button>
+        </div>
+
+        <!-- Relative positioning example -->
+        <div class="event-banner">
+            <p>Don't miss our upcoming event: <strong>DevWeekends</strong>
+                <span class="badge">NEW</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ---------- OUR VALUES (FLEXBOX) ---------- -->
+    <section>
+        <h2>Our Values</h2>
+        <div class="values-container">
+            <div class="value-card">Peer Mentorship</div>
+            <div class="value-card">Collaborative Learning</div>
+            <div class="value-card">Career Guidance</div>
+            <div class="value-card">Open-Source Projects</div>
+            <div class="value-card">Live Workshops</div>
+        </div>
+    </section>
+
+    <!-- ---------- BOX MODEL SECTION ---------- -->
+    <section>
+        <h2>Box Model</h2>
+        <div class="box-demo">
+            <div class="box box-padding">Large Padding</div>
+            <div class="box box-margin">Large Margin</div>
+            <div class="box box-border">Thick Border</div>
+        </div>
+    </section>
+
+    <!-- ---------- WHY JOIN US (GRID AUTO-FIT) ---------- -->
+    <section>
+        <h2>Why Join Us?</h2>
+        <div class="why-grid">
+            <div class="why-item">Grow Together</div>
+            <div class="why-item">Support</div>
+            <div class="why-item">Real-World Projects</div>
+            <div class="why-item">Innovate</div>
+            <div class="why-item">Mentorship</div>
+        </div>
+    </section>
+
+    <!-- ---------- COMMUNITY PILLARS (GRID AREAS) ---------- -->
+    <section>
+        <h2>Community Pillars</h2>
+        <div class="pillars-grid">
+            <div class="mentorship">Mentorship</div>
+            <div class="opensource">Open Source</div>
+            <div class="workshops">Workshops</div>
+            <div class="collaboration">Collaboration</div>
+            <div class="community">Community</div>
+        </div>
+    </section>
+
+    <!-- ---------- FOOTER ---------- -->
+    <footer>
+        <p>Code. Collaborate. Grow Together.</p>
+    </footer>
+
+</body>
+
+</html>
