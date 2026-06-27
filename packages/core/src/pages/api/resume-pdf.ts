@@ -39,7 +39,9 @@ export async function GET(
   const resumeData = resume.data as any
   const { format, width, height } = resumeData?.metadata?.page || { format: "a4" }
 
-  const token = cachePrintData(resumeData)
+  const crypto = require("crypto")
+  const secret = process.env.NEXTAUTH_SECRET || "fallback_secret"
+  const token = crypto.createHmac("sha256", secret).update(id).digest("hex")
   const exportUrl = `${host}/resumes/${id}/export?token=${token}`
 
   try {

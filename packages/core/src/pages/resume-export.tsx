@@ -15,12 +15,26 @@ export default async function ExportPage({
   const { token } = await searchParams
 
   let data: any = null
+  let authorized = false
 
   if (token) {
-    data = getPrintData(token)
+    const crypto = require("crypto")
+    const secret = process.env.NEXTAUTH_SECRET || "fallback_secret"
+    const expectedToken = crypto.createHmac("sha256", secret).update(id).digest("hex")
+    
+    if (token === expectedToken) {
+      authorized = true
+    }
   }
 
-  if (!data) {
+  if (authorized) {
+    const { db } = await import("@/lib/db")
+    const { resumes } = await import("@/lib/db/schema")
+    const { eq } = await import("drizzle-orm")
+    const [resume] = await db.select().from(resumes).where(eq(resumes.id, id)).limit(1)
+    if (!resume) notFound()
+    data = resume.data
+  } else {
     const resume = await getResumeById(id)
     if (!resume) {
       notFound()
