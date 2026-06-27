@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useAIStore, AIProvider } from "@/store/use-ai-store"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/shared/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/shared/ui/card"
 import { Input } from "@/components/shared/ui/input"
 import { Label } from "@/components/shared/ui/label"
@@ -327,24 +328,27 @@ export function ProfileTabsClient({ user, googleEnabled = true, githubEnabled = 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col justify-end">
                   <Label htmlFor="provider" className="mb-1">Provider</Label>
-                  <select
-                    id="provider"
+                  <Select
                     value={aiProvider}
-                    onChange={(e) => {
-                      const v = e.target.value as AIProvider
-                      setAiProvider(v)
-                      if (v === 'openai' && !aiModel) setAiModel('gpt-4o')
-                      if (v === 'anthropic' && !aiModel) setAiModel('claude-3-opus-20240229')
-                      if (v === 'openrouter' && !aiModel) setAiModel('google/gemini-2.5-flash')
+                    onValueChange={(v) => {
+                      const p = v as AIProvider
+                      setAiProvider(p)
+                      if (p === 'openai' && !aiModel) setAiModel('gpt-4o')
+                      if (p === 'anthropic' && !aiModel) setAiModel('claude-3-opus-20240229')
+                      if (p === 'openrouter' && !aiModel) setAiModel('google/gemini-2.5-flash')
                     }}
-                    className="flex h-9 w-full rounded-md border border-border/40 bg-muted/10 px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
                   >
-                    <option value="openai">OpenAI</option>
-                    <option value="anthropic">Anthropic</option>
-                    <option value="gemini">Google Gemini</option>
-                    <option value="openrouter">OpenRouter</option>
-                    <option value="custom">Custom / Local</option>
-                  </select>
+                    <SelectTrigger id="provider" className="h-9 border-border/40 bg-muted/10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI</SelectItem>
+                      <SelectItem value="anthropic">Anthropic</SelectItem>
+                      <SelectItem value="gemini">Google Gemini</SelectItem>
+                      <SelectItem value="openrouter">OpenRouter</SelectItem>
+                      <SelectItem value="custom">Custom / Local</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="model">Model ID</Label>
