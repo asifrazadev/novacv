@@ -9,6 +9,7 @@
  *   node scripts/seed.js --staging     (uses STAGING_DATABASE_URL)
  */
 
+const crypto = require("crypto")
 const bcrypt = require("bcryptjs")
 const { Pool } = require("pg")
 const { resolveDatabaseUrl } = require("./lib/db-url")
@@ -113,11 +114,11 @@ async function main() {
     const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10)
 
     const { rows: userRows } = await client.query(
-      `INSERT INTO users (email, name, password_hash, professional_title)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO users (id, email, name, password_hash, professional_title, email_verified)
+       VALUES ($1, $2, $3, $4, $5, NOW())
        ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
        RETURNING id`,
-      [DEMO_EMAIL, "Jordan Rivera", passwordHash, "Senior Product Designer"]
+      [crypto.randomUUID(), DEMO_EMAIL, "Jordan Rivera", passwordHash, "Senior Product Designer"]
     )
     const userId = userRows[0].id
     console.log(`  ✅  demo user ready (${DEMO_EMAIL} / ${DEMO_PASSWORD})`)
