@@ -8,32 +8,22 @@
  *
  * Usage:
  *   node scripts/migrate.js
+ *   node scripts/migrate.js --staging     (uses STAGING_DATABASE_URL)
  *   DATABASE_URL=postgres://... node scripts/migrate.js
  */
 
 const fs   = require("fs")
 const path = require("path")
 const { Pool } = require("pg")
+const { resolveDatabaseUrl } = require("./lib/db-url")
 
 async function main() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    // Try loading .env.local
-    try {
-      const envFile = fs.readFileSync(
-        path.join(__dirname, "..", ".env.local"),
-        "utf8"
-      )
-      for (const line of envFile.split("\n")) {
-        const m = line.match(/^DATABASE_URL=["']?(.+?)["']?\s*$/)
-        if (m) { process.env.DATABASE_URL = m[1]; break }
-      }
-    } catch {}
-  }
+  const staging = process.argv.includes("--staging")
+  const varName = staging ? "STAGING_DATABASE_URL" : "DATABASE_URL"
 
-  const connectionString = process.env.DATABASE_URL
+  const connectionString = resolveDatabaseUrl(varName)
   if (!connectionString) {
-    console.error("❌  DATABASE_URL is not set. Pass it as an env var or set it in apps/web/.env.local")
+    console.error(`❌  ${varName} is not set. Pass it as an env var or set it in .env.local`)
     process.exit(1)
   }
 
