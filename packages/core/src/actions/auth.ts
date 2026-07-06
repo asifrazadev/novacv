@@ -50,19 +50,25 @@ export async function signup(formData: FormData) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
+  const smtpConfigured = !!process.env.SMTP_HOST
 
   await db.insert(users).values({
     email,
     name: fullName || null,
     passwordHash,
+    // No SMTP configured (e.g. staging/preview) — skip verification since the
+    // link could never be delivered anyway.
+    emailVerified: smtpConfigured ? null : new Date(),
   })
 
-  try {
-    const token = await generateVerificationToken(email)
-    const baseUrl = getBaseUrl()
-    await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
-  } catch (err) {
-    console.error("Failed to send verification email:", err)
+  if (smtpConfigured) {
+    try {
+      const token = await generateVerificationToken(email)
+      const baseUrl = getBaseUrl()
+      await sendVerificationEmail(email, `${baseUrl}/auth/verify?token=${token}`)
+    } catch (err) {
+      console.error("Failed to send verification email:", err)
+    }
   }
 
   redirect("/register?status=success")

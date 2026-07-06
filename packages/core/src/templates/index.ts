@@ -2,6 +2,7 @@ import { ModernTemplate } from "./modern"
 import { JakeTemplate } from "./Jake"
 import { ExecutiveTemplate } from "./executive"
 import { AcademicTemplate } from "./academic"
+import { TypewriterTemplate } from "./typewriter"
 
 export interface TemplateFeatures {
   /** Whether this template renders a visual skill level (bar, dots, %). If false, level is noise — omit from AI context. */
@@ -52,6 +53,18 @@ export const templates = [
     features: { skillLevel: false, languageLevel: true } satisfies TemplateFeatures,
     defaultLayout: {
       main: ["summary", "education", "experience", "projects", "skills", "awards", "certifications", "volunteer", "publications", "references", "languages", "interests", "profiles"],
+      sidebar: []
+    }
+  }
+  ,
+  {
+    id: "typewriter",
+    name: "Typewriter",
+    component: TypewriterTemplate,
+    thumbnail: "/thumbnails/typewriter.png",
+    features: { skillLevel: false, languageLevel: true } satisfies TemplateFeatures,
+    defaultLayout: {
+      main: ["summary", "experience","skills", "profiles", "education", "projects", "volunteer", "languages", "awards", "certifications", "publications", "references", "interests"],
       sidebar: []
     }
   }
