@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
 const stack = [
-  "Next.js", "Supabase", "PostgreSQL", "Tailwind CSS",
+  "Next.js", "PostgreSQL", "Tailwind CSS",
   "TypeScript", "React", "Zustand", "Vercel AI SDK",
   "Playwright", "Zod", "Shadcn UI", "Radix UI"
 ]

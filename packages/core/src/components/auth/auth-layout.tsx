@@ -7,7 +7,7 @@ import { GitHubIcon } from "./icons"
 import TextLogo from "@/components/shared/logotext"
 
 const defaultStack = [
-  "Next.js", "Supabase", "PostgreSQL", "Tailwind CSS",
+  "Next.js", "PostgreSQL", "Tailwind CSS",
   "TypeScript", "React", "Zustand", "Vercel AI SDK",
   "Playwright", "Zod", "Shadcn UI", "Radix UI"
 ]

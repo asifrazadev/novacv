@@ -37,7 +37,7 @@ novacv/
 
 - **Node.js** 22+
 - **npm** 10.8+
-- A **PostgreSQL** database (local, Docker, or Supabase)
+- A **PostgreSQL** database (local or Docker)
 
 ### Steps
 
