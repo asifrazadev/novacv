@@ -45,10 +45,10 @@ export function OpenSourceCTA() {
 
               <div className="flex-shrink-0 grid grid-cols-2 gap-3 text-sm">
                 {[
-                  { label: "AI Providers", value: "5+" },
-                  { label: "Templates", value: "4" },
-                  { label: "Export Formats", value: "2" },
-                  { label: "Auth Methods", value: "5" },
+                  { label: "AI Providers", value: "6+" },
+                  { label: "Templates", value: "5" },
+                  { label: "Export Formats", value: "Multiple" },
+                  { label: "License", value: "MIT" },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/60 bg-muted/20 min-w-[100px]">
                     <span className="text-2xl font-black text-foreground">{item.value}</span>

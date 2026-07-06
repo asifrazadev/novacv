@@ -114,7 +114,7 @@ export default async function ExportPage({
           page-break-after: always;
         }
         /* Prevent break inside individual section items */
-        .section-item, [data-item-id] {
+        [data-item-id] {
           break-inside: avoid;
           page-break-inside: avoid;
         }

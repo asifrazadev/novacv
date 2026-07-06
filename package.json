@@ -6,7 +6,11 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "migrate": "node scripts/migrate.js"
+    "migrate": "node scripts/migrate.js",
+    "migrate:staging": "node scripts/migrate.js --staging",
+    "seed": "node scripts/seed.js",
+    "seed:staging": "node scripts/seed.js --staging",
+    "deploy:staging": "npm run build && npm run migrate:staging && npm run seed:staging"
   },
   "workspaces": [
     "apps/*",
