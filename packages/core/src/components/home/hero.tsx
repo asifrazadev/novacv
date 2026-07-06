@@ -6,9 +6,9 @@ import { Button } from "@/components/shared/ui/button"
 import { ATSRing } from "@/components/shared/ui/ats-ring"
 
 const STATS = [
-  { label: "Templates", value: "4" },
+  { label: "Templates", value: "5" },
   { label: "AI Tools", value: "6+" },
-  { label: "Export Formats", value: "PDF · DOCX" },
+  { label: "Export Formats", value: "Multiple" },
   { label: "License", value: "MIT" },
 ]
 
@@ -150,7 +150,7 @@ export function Hero() {
                 <span className="text-xs font-semibold text-foreground whitespace-nowrap">Cover Letter Ready</span>
               </div>
 
-              <div className="absolute top-1/3 -left-4 sm:-left-14 z-20 bg-card border border-border rounded-xl px-3 py-2 shadow-xl flex items-center gap-2 animate-in slide-in-from-left duration-700 delay-700 group-hover:border-primary/20 transition-colors">
+              <div className="absolute top-1/2 -left-4 sm:-left-14 z-20 bg-card border border-border rounded-xl px-3 py-2 shadow-xl flex items-center gap-2 animate-in slide-in-from-left duration-700 delay-700 group-hover:border-primary/20 transition-colors">
                 <div className="w-6 h-6 rounded-md bg-success/10 flex items-center justify-center">
                   <ShieldCheck className="w-3.5 h-3.5 text-success" />
                 </div>
