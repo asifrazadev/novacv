@@ -319,9 +319,9 @@ export default function TrackerPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-center flex-wrap">
-          <a 
+          <a
             id="tour-download-extension"
-            href="/api/extension/download" 
+            href="/api/extension/download"
             className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-bold ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 h-8 px-3 py-2 gap-1.5 flex-1 sm:flex-none"
           >
             <Download className="w-3.5 h-3.5" />
@@ -348,14 +348,6 @@ export default function TrackerPage() {
         </div>
       </div>
 
-      {localMode && (
-        <div className="flex items-center gap-2 px-4 py-3 border border-warning/20 bg-warning/5 text-warning rounded-lg text-xs leading-normal">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>
-            <strong>Local Sandbox Mode:</strong> The Supabase <code>job_applications</code> database table doesn't exist yet. All additions, updates, and reorderings are safely stored in your local browser sandbox.
-          </span>
-        </div>
-      )}
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

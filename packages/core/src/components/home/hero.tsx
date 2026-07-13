@@ -13,6 +13,11 @@ const STATS = [
 ]
 
 export function Hero() {
+
+  const handleDownload = () => {
+    window.location.href = "/api/extension/download"
+  }
+
   return (
     <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden">
       {/* Grid background */}
@@ -45,10 +50,8 @@ export function Hero() {
                   Build my resume, free <Zap className="ml-2 w-5 h-5 fill-current" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="w-full sm:w-auto h-14 px-8 rounded-xl text-base font-bold border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all duration-300">
-                <a href="/api/extension/download">
-                  Download Extension
-                </a>
+              <Button size="lg" variant="outline" onClick={handleDownload} className="w-full sm:w-auto h-14 px-8 rounded-xl text-base font-bold border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all duration-300">
+                Download Extension
               </Button>
             </div>
 
